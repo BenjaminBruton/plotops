@@ -4,6 +4,58 @@
 BEGIN;
 
 -- ============================================================================
+-- ENUMS AND TYPES
+-- ============================================================================
+
+CREATE TYPE plotops.user_role AS ENUM (
+    'producer',
+    'director',
+    'ad',
+    'casting_director',
+    'scout',
+    'editor',
+    'publicist',
+    'admin'
+);
+
+CREATE TYPE plotops.project_status AS ENUM (
+    'development',
+    'pre_production',
+    'production',
+    'post_production',
+    'completed',
+    'cancelled'
+);
+
+CREATE TYPE plotops.scene_type AS ENUM (
+    'int',
+    'ext',
+    'int_ext'
+);
+
+CREATE TYPE plotops.time_of_day AS ENUM (
+    'day',
+    'night',
+    'dawn',
+    'dusk',
+    'magic_hour'
+);
+
+CREATE TYPE plotops.location_status AS ENUM (
+    'scouting',
+    'pending',
+    'secured',
+    'rejected'
+);
+
+CREATE TYPE plotops.casting_status AS ENUM (
+    'open',
+    'callback',
+    'cast',
+    'closed'
+);
+
+-- ============================================================================
 -- CORE TABLES
 -- ============================================================================
 

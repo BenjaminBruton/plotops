@@ -674,6 +674,7 @@ export interface ValidationRule {
 // EXPORTS
 // ============================================================================
 
-export * from './database';
+// Note: database.ts is not exported here to avoid circular dependency
+// Import directly from './database' when needed
 export * from './api';
 export * from './components';

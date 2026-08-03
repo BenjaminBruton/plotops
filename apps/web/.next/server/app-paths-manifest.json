@@ -1,8 +1,5 @@
 {
-  "/not-found": "app/not-found.js",
   "/page": "app/page.js",
-  "/script-breakdown/page": "app/script-breakdown/page.js",
-  "/jobs/page": "app/jobs/page.js",
-  "/stripboard/page": "app/stripboard/page.js",
-  "/talent/profile/page": "app/talent/profile/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/projects/page": "app/projects/page.js"
 }

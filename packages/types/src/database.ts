@@ -339,3 +339,165 @@ export interface RestoreResult {
   duration_ms: number;
   errors?: string[];
 }
+
+// ============================================================================
+// PROJECT EXTENSION TYPES (Budget, Documents, Milestones, Schedule)
+// ============================================================================
+
+// Enums
+export type MilestoneStatus = 'pending' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
+export type DeliverableStatus = 'pending' | 'in_progress' | 'delivered' | 'approved' | 'rejected';
+export type ScheduleStatus = 'scheduled' | 'in_progress' | 'wrapped' | 'cancelled';
+export type ProgressCalculationMethod = 'manual' | 'scenes_based' | 'milestones_based' | 'hybrid';
+
+// Budget Types
+export interface ProjectBudget {
+  id: string;
+  project_id: string;
+  department: string;
+  category?: string;
+  budgeted_amount: number;
+  actual_amount: number;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BudgetTransaction {
+  id: string;
+  budget_id: string;
+  description: string;
+  amount: number;
+  transaction_date: string;
+  vendor?: string;
+  receipt_url?: string;
+  approved_by?: string;
+  notes?: string;
+  created_by?: string;
+  created_at: string;
+}
+
+export interface BudgetSummary {
+  total_budgeted: number;
+  total_actual: number;
+  variance: number;
+  percentage_spent: number;
+}
+
+// Document Types
+export interface ProjectDocument {
+  id: string;
+  project_id: string;
+  title: string;
+  document_type?: string;
+  version?: string;
+  file_url: string;
+  file_size?: number;
+  mime_type?: string;
+  description?: string;
+  is_current_version: boolean;
+  uploaded_by?: string;
+  approved_by?: string;
+  approval_date?: string;
+  tags?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+// Milestone & Deliverable Types
+export interface ProjectMilestone {
+  id: string;
+  project_id: string;
+  title: string;
+  description?: string;
+  milestone_type?: string;
+  target_date?: string;
+  actual_date?: string;
+  status: MilestoneStatus;
+  completion_percentage: number;
+  assigned_to?: string;
+  dependencies?: Record<string, any>;
+  notes?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectDeliverable {
+  id: string;
+  project_id: string;
+  milestone_id?: string;
+  title: string;
+  deliverable_type?: string;
+  description?: string;
+  due_date?: string;
+  delivered_date?: string;
+  status: DeliverableStatus;
+  file_url?: string;
+  review_notes?: string;
+  approved_by?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Schedule Types
+export interface ShootingSchedule {
+  id: string;
+  project_id: string;
+  shoot_date: string;
+  location_id?: string;
+  call_time?: string;
+  wrap_time?: string;
+  crew_call?: string;
+  notes?: string;
+  weather_conditions?: string;
+  status: ScheduleStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ScheduleScene {
+  id: string;
+  schedule_id: string;
+  scene_id: string;
+  planned_start_time?: string;
+  planned_duration?: number;
+  actual_start_time?: string;
+  actual_end_time?: string;
+  status: string;
+  takes_count: number;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductionReport {
+  id: string;
+  project_id: string;
+  schedule_id?: string;
+  report_date: string;
+  scenes_completed: number;
+  pages_completed: number;
+  total_scenes_to_date: number;
+  total_pages_to_date: number;
+  crew_count?: number;
+  cast_count?: number;
+  extras_count?: number;
+  meals_served?: Record<string, number>;
+  incidents?: string;
+  weather_summary?: string;
+  notes?: string;
+  submitted_by?: string;
+  approved_by?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Extended Project type with progress tracking
+export interface ProjectWithProgress extends Project {
+  progress_percentage: number;
+  progress_calculation_method: ProgressCalculationMethod;
+  total_shoot_days?: number;
+  completed_shoot_days: number;
+}
