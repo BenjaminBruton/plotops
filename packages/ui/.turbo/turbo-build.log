@@ -1,0 +1,20 @@
+
+> @plotops/ui@1.0.0 build /Users/benjaminbruton/Desktop/PlotOps/packages/ui
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: tsconfig.json
+CLI tsup v7.2.0
+CLI Using tsup config: /Users/benjaminbruton/Desktop/PlotOps/packages/ui/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS dist/index.js     47.77 KB
+CJS dist/index.js.map 67.43 KB
+CJS ⚡️ Build success in 50ms
+ESM dist/index.mjs     41.73 KB
+ESM dist/index.mjs.map 67.28 KB
+ESM ⚡️ Build success in 50ms
+DTS Build start
+ ELIFECYCLE  Command failed.

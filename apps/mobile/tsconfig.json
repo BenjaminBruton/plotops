@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-native",
+    "lib": ["dom", "esnext"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@plotops/types": ["../../packages/types/src"],
+      "@plotops/ui": ["../../packages/ui/src"],
+      "@plotops/business-logic": ["../../packages/business-logic/src"],
+      "@plotops/api-client": ["../../packages/api-client/src"],
+      "@plotops/auth": ["../../packages/auth/src"],
+      "@plotops/shared": ["../../packages/shared/src"],
+      "@plotops/config": ["../../packages/config/src"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

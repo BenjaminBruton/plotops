@@ -1,0 +1,208 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    ".env.template",
+    "docker-compose.yml",
+    "docker-compose.override.yml"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY",
+    "EXPO_PUBLIC_SUPABASE_URL",
+    "EXPO_PUBLIC_SUPABASE_ANON_KEY"
+  ],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "public/**",
+        "package.json",
+        "tsconfig.json",
+        "next.config.js",
+        "tailwind.config.js",
+        "app.json"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "build/**",
+        "lib/**",
+        "*.tsbuildinfo"
+      ],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "EXPO_PUBLIC_*"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": [
+        "NODE_ENV",
+        "PORT",
+        "NEXT_PUBLIC_*",
+        "EXPO_PUBLIC_*"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "*.js",
+        "*.ts",
+        "*.tsx",
+        ".eslintrc.js",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "*.js",
+        "*.ts",
+        "*.tsx",
+        ".eslintrc.js",
+        "package.json"
+      ],
+      "outputs": [],
+      "cache": false
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "*.ts",
+        "*.tsx",
+        "tsconfig.json",
+        "package.json"
+      ],
+      "outputs": ["*.tsbuildinfo"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "__tests__/**",
+        "*.test.*",
+        "*.spec.*",
+        "jest.config.*",
+        "vitest.config.*",
+        "package.json"
+      ],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV"]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "__tests__/**",
+        "*.test.*",
+        "*.spec.*",
+        "jest.config.*",
+        "vitest.config.*",
+        "package.json"
+      ],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "__tests__/**",
+        "*.test.*",
+        "*.spec.*",
+        "jest.config.*",
+        "vitest.config.*",
+        "package.json"
+      ],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "inputs": [
+        "src/**",
+        "e2e/**",
+        "playwright.config.*",
+        "cypress.config.*",
+        "package.json"
+      ],
+      "outputs": [
+        "test-results/**",
+        "playwright-report/**",
+        "cypress/videos/**",
+        "cypress/screenshots/**"
+      ],
+      "env": ["NODE_ENV"],
+      "cache": false
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "test/**",
+        "__tests__/**",
+        "*.test.*",
+        "*.spec.*",
+        "jest.config.*",
+        "vitest.config.*",
+        "package.json"
+      ],
+      "outputs": ["coverage/**"],
+      "env": ["NODE_ENV"]
+    },
+    "clean": {
+      "cache": false,
+      "inputs": [],
+      "outputs": []
+    },
+    "format": {
+      "inputs": [
+        "src/**",
+        "*.js",
+        "*.ts",
+        "*.tsx",
+        "*.json",
+        "*.md",
+        ".prettierrc*",
+        "package.json"
+      ],
+      "outputs": [],
+      "cache": false
+    },
+    "format:check": {
+      "inputs": [
+        "src/**",
+        "*.js",
+        "*.ts",
+        "*.tsx",
+        "*.json",
+        "*.md",
+        ".prettierrc*",
+        "package.json"
+      ],
+      "outputs": []
+    }
+  },
+  "remoteCache": {
+    "signature": true
+  }
+}

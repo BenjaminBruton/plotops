@@ -1,0 +1,211 @@
+{
+  "name": "Call Sheet Generation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1a2b3c4d-5e6f-7890-abcd-ef1234567890",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "call-sheet-trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT s.*, l.name as location_name, l.address, l.contact_name, l.contact_phone FROM plotops.scenes s LEFT JOIN plotops.scene_locations sl ON s.id = sl.scene_id LEFT JOIN plotops.locations l ON sl.location_id = l.id WHERE s.id = $1",
+        "additionalFields": {
+          "queryParameters": "={{ $json.scene_id }}"
+        }
+      },
+      "id": "2b3c4d5e-6f78-9012-bcde-f23456789012",
+      "name": "Get Scene Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.*, a.first_name, a.last_name, a.phone FROM plotops.scene_characters sc JOIN plotops.characters c ON sc.character_id = c.id LEFT JOIN plotops.character_casting cc ON c.id = cc.character_id LEFT JOIN plotops.actors a ON cc.actor_id = a.id WHERE sc.scene_id = $1",
+        "additionalFields": {
+          "queryParameters": "={{ $json.scene_id }}"
+        }
+      },
+      "id": "3c4d5e6f-7890-1234-cdef-456789012345",
+      "name": "Get Cast List",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://api.openweathermap.org/data/2.5/weather",
+        "options": {
+          "queryParameters": {
+            "q": "={{ $('Get Scene Details').first().json.location_name }}",
+            "appid": "={{ $env.OPENWEATHER_API_KEY }}",
+            "units": "imperial"
+          }
+        }
+      },
+      "id": "4d5e6f78-9012-3456-def0-56789012345a",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sceneData = $('Get Scene Details').first().json;\nconst castData = $('Get Cast List').all().map(item => item.json);\nconst weatherData = $('Get Weather').first().json;\n\n// Format call sheet data\nconst callSheet = {\n  project_title: sceneData.project_title || 'Unknown Project',\n  scene_number: sceneData.scene_number,\n  scene_name: sceneData.scene_name,\n  location: {\n    name: sceneData.location_name,\n    address: sceneData.address,\n    contact: sceneData.contact_name,\n    phone: sceneData.contact_phone\n  },\n  weather: {\n    temperature: Math.round(weatherData.main?.temp || 70),\n    description: weatherData.weather?.[0]?.description || 'Unknown',\n    humidity: weatherData.main?.humidity || 'Unknown'\n  },\n  cast: castData.map(actor => ({\n    character: actor.name,\n    actor: actor.first_name && actor.last_name ? `${actor.first_name} ${actor.last_name}` : 'TBD',\n    phone: actor.phone || 'TBD',\n    call_time: '6:00 AM', // This would be calculated based on scene schedule\n    pickup_time: '5:30 AM'\n  })),\n  crew_call: '5:00 AM',\n  wrap_estimate: '6:00 PM',\n  safety_notes: [\n    'All crew must wear safety vests on location',\n    'First aid kit available with AD',\n    'Emergency contact: 911'\n  ],\n  special_requirements: sceneData.special_requirements || 'None',\n  generated_at: new Date().toISOString()\n};\n\nreturn { json: callSheet };"
+      },
+      "id": "5e6f7890-1234-5678-ef01-6789012345ab",
+      "name": "Format Call Sheet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "resource": "document",
+        "documentId": "call-sheet-template",
+        "additionalFields": {
+          "templateData": "={{ JSON.stringify($json) }}"
+        }
+      },
+      "id": "6f789012-3456-7890-f012-789012345abc",
+      "name": "Generate PDF",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "fromEmail": "production@plotops.com",
+        "toEmail": "={{ $json.cast.map(c => c.email).join(',') }}",
+        "subject": "Call Sheet - {{ $('Format Call Sheet').first().json.scene_name }}",
+        "emailFormat": "html",
+        "message": "<h2>Call Sheet</h2><p>Please find attached the call sheet for tomorrow's shoot.</p><p><strong>Scene:</strong> {{ $('Format Call Sheet').first().json.scene_name }}</p><p><strong>Location:</strong> {{ $('Format Call Sheet').first().json.location.name }}</p><p><strong>Weather:</strong> {{ $('Format Call Sheet').first().json.weather.temperature }}°F, {{ $('Format Call Sheet').first().json.weather.description }}</p>",
+        "attachments": "={{ $('Generate PDF').first().json.documentUrl }}"
+      },
+      "id": "789012345-6789-0123-0123-89012345abcd",
+      "name": "Email Call Sheet",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "plotops.call_sheets",
+        "columns": "scene_id, pdf_url, generated_at, sent_to",
+        "additionalFields": {
+          "values": "={{ $('Webhook Trigger').first().json.scene_id }}, {{ $('Generate PDF').first().json.documentUrl }}, {{ new Date().toISOString() }}, {{ $('Format Call Sheet').first().json.cast.map(c => c.actor).join(', ') }}"
+        }
+      },
+      "id": "89012345a-bcde-f012-3456-9012345abcde",
+      "name": "Log Call Sheet",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1780, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Scene Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scene Details": {
+      "main": [
+        [
+          {
+            "node": "Get Cast List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cast List": {
+      "main": [
+        [
+          {
+            "node": "Get Weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weather": {
+      "main": [
+        [
+          {
+            "node": "Format Call Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Call Sheet": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF": {
+      "main": [
+        [
+          {
+            "node": "Email Call Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Call Sheet": {
+      "main": [
+        [
+          {
+            "node": "Log Call Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "America/Chicago"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "call-sheet-generation",
+  "tags": [
+    {
+      "createdAt": "2024-03-27T16:00:00.000Z",
+      "updatedAt": "2024-03-27T16:00:00.000Z",
+      "id": "production",
+      "name": "Production"
+    }
+  ]
+}

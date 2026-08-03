@@ -1,0 +1,45 @@
+
+> @plotops/api-client@1.0.0 build /Users/benjaminbruton/Desktop/PlotOps/packages/api-client
+> tsup
+
+CLI Building entry: src/index.ts
+CLI Using tsconfig: ../../tsconfig.json
+CLI tsup v7.2.0
+CLI Using tsup config: /Users/benjaminbruton/Desktop/PlotOps/packages/api-client/tsup.config.ts
+CLI Target: es2022
+CLI Cleaning output folder
+CJS Build start
+ESM Build start
+CJS dist/index.js     37.82 KB
+CJS dist/index.js.map 73.33 KB
+CJS ⚡️ Build success in 57ms
+ESM dist/index.mjs     35.34 KB
+ESM dist/index.mjs.map 73.18 KB
+ESM ⚡️ Build success in 60ms
+DTS Build start
+src/index.ts(706,84): error TS2345: Argument of type 'Buffer' is not assignable to parameter of type 'string | ArrayBuffer | SharedArrayBuffer | ArrayBufferView'.
+  Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike>'.
+    Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+      The types of 'slice(...).buffer' are incompatible between these types.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+            Types of property '[Symbol.toStringTag]' are incompatible.
+              Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+
+Error: error occured in dts build
+    at Worker.<anonymous> (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/tsup@7.2.0_postcss@8.4.49_ts-node@10.9.2_typescript@5.9.3/node_modules/tsup/dist/index.js:2294:26)
+    at Worker.emit (node:events:508:20)
+    at MessagePort.<anonymous> (node:internal/worker:333:53)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)
+DTS Build error
+RollupError: Failed to compile. Check the logs above.
+    at error (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/rollup@3.30.0/node_modules/rollup/dist/shared/rollup.js:353:30)
+    at Object.error (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/rollup@3.30.0/node_modules/rollup/dist/shared/rollup.js:1727:20)
+    at Object.error (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/rollup@3.30.0/node_modules/rollup/dist/shared/rollup.js:25656:42)
+    at generateDtsFromTs (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/tsup@7.2.0_postcss@8.4.49_ts-node@10.9.2_typescript@5.9.3/node_modules/tsup/dist/rollup.js:7512:22)
+    at /Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/tsup@7.2.0_postcss@8.4.49_ts-node@10.9.2_typescript@5.9.3/node_modules/tsup/dist/rollup.js:7519:59
+    at _nullishCoalesce (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/tsup@7.2.0_postcss@8.4.49_ts-node@10.9.2_typescript@5.9.3/node_modules/tsup/dist/rollup.js:1:198)
+    at Object.transform (/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/tsup@7.2.0_postcss@8.4.49_ts-node@10.9.2_typescript@5.9.3/node_modules/tsup/dist/rollup.js:7519:18)
+    at /Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/rollup@3.30.0/node_modules/rollup/dist/shared/rollup.js:1920:40
+ ELIFECYCLE  Command failed with exit code 1.

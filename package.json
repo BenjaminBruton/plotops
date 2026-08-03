@@ -1,24 +1,119 @@
 {
-  "name": "plotops",
+  "name": "plotops-monorepo",
   "version": "1.0.0",
-  "main": "index.ts",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "dependencies": {
-    "expo": "~55.0.8",
-    "expo-status-bar": "~55.0.4",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-native": "0.83.2",
-    "react-native-web": "^0.21.0"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    
+    "web:dev": "pnpm --filter web dev",
+    "mobile:dev": "pnpm --filter mobile dev",
+    "mobile:ios": "pnpm --filter mobile ios",
+    "mobile:android": "pnpm --filter mobile android",
+    
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v --remove-orphans && docker system prune -f",
+    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
+    
+    "services:start": "docker-compose up -d supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage n8n redis",
+    "services:stop": "docker-compose stop",
+    "services:restart": "docker-compose restart",
+    "services:logs": "docker-compose logs -f supabase-db supabase-kong n8n",
+    
+    "db:setup": "node tools/dev/setup-database.js",
+    "db:migrate": "node tools/dev/migrate-database.js",
+    "db:seed": "node tools/dev/seed-database.js",
+    "db:reset": "node tools/dev/reset-database.js",
+    "db:backup": "node tools/dev/backup-database.js",
+    "db:restore": "node tools/dev/restore-database.js",
+    
+    "supabase:start": "docker-compose up -d supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage supabase-studio",
+    "supabase:stop": "docker-compose stop supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage supabase-studio",
+    "supabase:studio": "open http://localhost:3001",
+    "supabase:logs": "docker-compose logs -f supabase-db supabase-kong supabase-auth supabase-rest",
+    
+    "n8n:start": "docker-compose up -d n8n",
+    "n8n:stop": "docker-compose stop n8n",
+    "n8n:open": "open http://localhost:5678",
+    "n8n:backup": "node tools/dev/backup-n8n.js",
+    "n8n:restore": "node tools/dev/restore-n8n.js",
+    
+    "dev:setup": "node tools/dev/setup-environment.js",
+    "dev:validate": "node tools/dev/validate-environment.js",
+    "dev:reset": "npm run docker:clean && npm run dev:setup",
+    "dev:status": "node tools/dev/check-services.js",
+    
+    "env:copy": "cp .env.template .env",
+    "env:validate": "node tools/dev/validate-env.js",
+    "env:generate-keys": "node tools/dev/generate-keys.js",
+    
+    "test:unit": "turbo run test:unit",
+    "test:integration": "turbo run test:integration",
+    "test:e2e": "turbo run test:e2e",
+    "test:watch": "turbo run test:watch",
+    "test:coverage": "turbo run test:coverage",
+    
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    
+    "build:web": "pnpm --filter web build",
+    "build:mobile": "pnpm --filter mobile build",
+    "build:packages": "turbo run build --filter='./packages/*'",
+    
+    "deploy:web": "node tools/dev/deploy-web.js",
+    "deploy:mobile": "node tools/dev/deploy-mobile.js",
+    
+    "generate:types": "node tools/dev/generate-types.js",
+    "generate:api": "node tools/dev/generate-api-client.js",
+    "generate:docs": "node tools/dev/generate-docs.js",
+    
+    "security:audit": "pnpm audit --audit-level moderate",
+    "security:check": "node tools/dev/security-check.js",
+    
+    "prepare": "husky install",
+    "postinstall": "turbo run build --filter='./packages/*'"
   },
   "devDependencies": {
-    "@types/react": "~19.2.2",
-    "typescript": "~5.9.2"
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
+    "concurrently": "^8.0.0",
+    "cross-env": "^7.0.0",
+    "dotenv": "^16.0.0",
+    "nodemon": "^3.0.0",
+    "rimraf": "^5.0.0",
+    "wait-on": "^7.0.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1",
+    "execa": "^5.1.1",
+    "fs-extra": "^11.0.0",
+    "pg": "^8.11.0",
+    "redis": "^4.6.0"
   },
-  "private": true
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.6.0"
 }

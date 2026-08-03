@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@plotops/types": ["../../packages/types/src"],
+      "@plotops/ui": ["../../packages/ui/src"],
+      "@plotops/business-logic": ["../../packages/business-logic/src"],
+      "@plotops/api-client": ["../../packages/api-client/src"],
+      "@plotops/auth": ["../../packages/auth/src"],
+      "@plotops/shared": ["../../packages/shared/src"],
+      "@plotops/config": ["../../packages/config/src"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
