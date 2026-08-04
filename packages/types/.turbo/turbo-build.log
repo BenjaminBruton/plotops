@@ -2,94 +2,32 @@
 > @plotops/types@1.0.0 build /Users/benjaminbruton/Desktop/PlotOps/packages/types
 > tsc
 
-../../apps/web/src/app/dashboard/page.tsx(83,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/dashboard/page.tsx(98,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/dashboard/page.tsx(113,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/dashboard/page.tsx(128,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/dashboard/page.tsx(144,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/dashboard/page.tsx(159,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/page.tsx(23,16): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/page.tsx(29,16): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/page.tsx(139,18): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/app/page.tsx(194,18): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/components/layout/app-layout.tsx(98,14): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/components/layout/app-layout.tsx(176,18): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+../../apps/web/src/app/api/parse-script/route.ts(26,27): error TS2339: Property 'get' does not exist on type 'FormData'.
+../../apps/web/src/app/api/parse-script/route.ts(27,32): error TS2339: Property 'get' does not exist on type 'FormData'.
+../../apps/web/src/app/api/test-connection/route.ts(2,26): error TS2307: Cannot find module '@/lib/supabase' or its corresponding type declarations.
 ../../apps/web/src/components/layout/app-layout.tsx(205,11): error TS2322: Type 'import("/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/@types+react@18.2.0/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
   Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
     Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
 ../../apps/web/src/components/layout/sidebar.tsx(6,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
-../../apps/web/src/components/layout/talent-layout.tsx(82,12): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
-../../apps/web/src/components/layout/talent-layout.tsx(125,20): error TS2786: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof InternalLinkProps> & InternalLinkProps & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any) => ReactNode | Promise<ReactNode>'.
-      Type 'ReactElement<any, string | JSXElementConstructor<any>> | null' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-        Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode | Promise<ReactNode>'.
-          Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/sidebar.tsx(95,12): error TS2786: 'Film' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(109,22): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(118,23): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/sidebar.tsx(118,24): error TS2786: 'item.icon' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(129,14): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(138,15): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/sidebar.tsx(138,16): error TS2786: 'Settings' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
 ../../apps/web/src/components/ui/button.tsx(4,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
 ../../apps/web/src/components/ui/card.tsx(2,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
  ELIFECYCLE  Command failed with exit code 2.

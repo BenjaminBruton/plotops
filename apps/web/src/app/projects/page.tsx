@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import AppLayout from '../../components/layout/app-layout'
-import { getProjects, createProject, getProjectStats } from '@/lib/api/projects'
+import { getProjects, createProject, updateProject, getProjectStats } from '../../lib/api/projects'
 
 const statusColors = {
   development: "bg-gray-100 text-gray-800",
@@ -28,7 +28,12 @@ export default function Projects() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<any | null>(null)
   const [creating, setCreating] = useState(false)
+  const [updating, setUpdating] = useState(false)
+  const [organizationId, setOrganizationId] = useState<string | null>(null)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -36,12 +41,38 @@ export default function Projects() {
     slug: '',
     logline: '',
     status: 'development' as const,
-    organization_id: '' // Will need to get this from user context
+  })
+  
+  // Edit form state
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    slug: '',
+    logline: '',
+    genre: '',
+    status: 'development',
   })
 
   useEffect(() => {
     loadProjects()
+    loadOrganization()
   }, [])
+
+  async function loadOrganization() {
+    try {
+      const { supabase } = await import('../../lib/supabase')
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('id')
+        .limit(1)
+        .single()
+      
+      if (!error && data) {
+        setOrganizationId(data.id)
+      }
+    } catch (err) {
+      console.error('Failed to load organization:', err)
+    }
+  }
 
   async function loadProjects() {
     try {
@@ -60,6 +91,11 @@ export default function Projects() {
   async function handleCreateProject(e: React.FormEvent) {
     e.preventDefault()
     
+    if (!organizationId) {
+      setError('No organization found. Please create an organization first.')
+      return
+    }
+    
     try {
       setCreating(true)
       setError(null)
@@ -70,7 +106,7 @@ export default function Projects() {
       await createProject({
         ...formData,
         slug,
-        organization_id: formData.organization_id || '00000000-0000-0000-0000-000000000000' // Temporary - will need proper org ID
+        organization_id: organizationId
       })
       
       // Reset form and close modal
@@ -79,7 +115,6 @@ export default function Projects() {
         slug: '',
         logline: '',
         status: 'development',
-        organization_id: ''
       })
       setShowCreateModal(false)
       
@@ -90,6 +125,48 @@ export default function Projects() {
       setError(err.message || 'Failed to create project')
     } finally {
       setCreating(false)
+    }
+  }
+
+  function handleViewProject(project: any) {
+    setSelectedProject(project)
+    setShowViewModal(true)
+  }
+
+  function handleEditProject(project: any) {
+    setSelectedProject(project)
+    setEditFormData({
+      title: project.title || '',
+      slug: project.slug || '',
+      logline: project.logline || '',
+      genre: project.genre || '',
+      status: project.status || 'development',
+    })
+    setShowEditModal(true)
+  }
+
+  async function handleUpdateProject(e: React.FormEvent) {
+    e.preventDefault()
+    
+    if (!selectedProject) return
+    
+    try {
+      setUpdating(true)
+      setError(null)
+      
+      await updateProject(selectedProject.id, editFormData as any)
+      
+      // Close modal
+      setShowEditModal(false)
+      setSelectedProject(null)
+      
+      // Reload projects
+      await loadProjects()
+    } catch (err: any) {
+      console.error('Failed to update project:', err)
+      setError(err.message || 'Failed to update project')
+    } finally {
+      setUpdating(false)
     }
   }
 
@@ -196,10 +273,16 @@ export default function Projects() {
 
                     {/* Actions */}
                     <div className="flex space-x-2">
-                      <button className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      <button 
+                        onClick={() => handleViewProject(project)}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
                         View Details
                       </button>
-                      <button className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                      <button 
+                        onClick={() => handleEditProject(project)}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                      >
                         Manage
                       </button>
                     </div>
@@ -339,6 +422,240 @@ export default function Projects() {
                     disabled={creating}
                   >
                     {creating ? 'Creating...' : 'Create Project'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* View Project Modal (Read-Only) */}
+        {showViewModal && selectedProject && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">Project Details</h3>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false)
+                    setSelectedProject(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-2xl">×</span>
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Title & Status */}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-2">{selectedProject.title}</h4>
+                    <p className="text-sm text-gray-500">Slug: {selectedProject.slug}</p>
+                  </div>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColors[selectedProject.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
+                    {statusLabels[selectedProject.status as keyof typeof statusLabels] || selectedProject.status}
+                  </span>
+                </div>
+
+                {/* Logline */}
+                {selectedProject.logline && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Logline</h5>
+                    <p className="text-gray-900">{selectedProject.logline}</p>
+                  </div>
+                )}
+
+                {/* Synopsis */}
+                {selectedProject.synopsis && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Synopsis</h5>
+                    <p className="text-gray-900">{selectedProject.synopsis}</p>
+                  </div>
+                )}
+
+                {/* Project Info Grid */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Genre</h5>
+                    <p className="text-gray-900">{selectedProject.genre || 'Not set'}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Budget Range</h5>
+                    <p className="text-gray-900">{selectedProject.budget_range || 'Not set'}</p>
+                  </div>
+                  {selectedProject.start_date && (
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700 mb-2">Start Date</h5>
+                      <p className="text-gray-900">{new Date(selectedProject.start_date).toLocaleDateString()}</p>
+                    </div>
+                  )}
+                  {selectedProject.end_date && (
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700 mb-2">End Date</h5>
+                      <p className="text-gray-900">{new Date(selectedProject.end_date).toLocaleDateString()}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Progress */}
+                {selectedProject.progress_percentage !== null && (
+                  <div>
+                    <div className="flex justify-between text-sm text-gray-700 mb-2">
+                      <h5 className="font-medium">Progress</h5>
+                      <span className="font-semibold">{selectedProject.progress_percentage}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div 
+                        className="bg-blue-600 h-3 rounded-full transition-all" 
+                        style={{ width: `${selectedProject.progress_percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <div>
+                      <span className="font-medium">Created:</span> {new Date(selectedProject.created_at).toLocaleDateString()}
+                    </div>
+                    <div>
+                      <span className="font-medium">Last Updated:</span> {new Date(selectedProject.updated_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setShowViewModal(false)
+                    handleEditProject(selectedProject)
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Edit Project
+                </button>
+                <button
+                  onClick={() => {
+                    setShowViewModal(false)
+                    setSelectedProject(null)
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Project Modal */}
+        {showEditModal && selectedProject && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold mb-4">Edit Project</h3>
+              
+              <form onSubmit={handleUpdateProject}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Project Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editFormData.title}
+                      onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="The Heist"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Slug (URL-friendly name) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editFormData.slug}
+                      onChange={(e) => setEditFormData({ ...editFormData, slug: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="the-heist"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Logline / Description
+                    </label>
+                    <textarea
+                      value={editFormData.logline}
+                      onChange={(e) => setEditFormData({ ...editFormData, logline: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="A thrilling crime drama about..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Genre
+                    </label>
+                    <input
+                      type="text"
+                      value={editFormData.genre}
+                      onChange={(e) => setEditFormData({ ...editFormData, genre: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Action, Drama, Comedy, etc."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status *
+                    </label>
+                    <select
+                      value={editFormData.status}
+                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value as any })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="development">Development</option>
+                      <option value="pre_production">Pre-Production</option>
+                      <option value="production">Production</option>
+                      <option value="post_production">Post-Production</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded text-sm">
+                      {error}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditModal(false)
+                      setSelectedProject(null)
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    disabled={updating}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={updating}
+                  >
+                    {updating ? 'Updating...' : 'Update Project'}
                   </button>
                 </div>
               </form>
