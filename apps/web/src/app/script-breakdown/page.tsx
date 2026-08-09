@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import AppLayout from '../../components/layout/app-layout'
 import { getProjects } from '../../lib/api/projects'
 import { getScenes, getSceneStats, createScene, updateScene, deleteScene, type Scene } from '../../lib/api/scenes'
+import { updateCharacter, deleteCharacter } from '../../lib/api/characters'
 
 const statusColors = {
   not_scheduled: "bg-gray-100 text-gray-800",
@@ -35,12 +36,21 @@ export default function ScriptBreakdown() {
   const [showViewScene, setShowViewScene] = useState(false)
   const [showEditScene, setShowEditScene] = useState(false)
   const [selectedScene, setSelectedScene] = useState<any | null>(null)
+  const [showViewCharacter, setShowViewCharacter] = useState(false)
+  const [showEditCharacter, setShowEditCharacter] = useState(false)
+  const [selectedCharacter, setSelectedCharacter] = useState<any | null>(null)
   const [creating, setCreating] = useState(false)
   const [updating, setUpdating] = useState(false)
+  const [updatingCharacter, setUpdatingCharacter] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   
   // Form state for creating/editing scenes
+  const [activeTab, setActiveTab] = useState<'scenes' | 'characters'>('scenes')
+  const [sortBy, setSortBy] = useState<'scene_number' | 'place' | 'time' | 'location' | 'complexity'>('scene_number')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [characterSortBy, setCharacterSortBy] = useState<'name' | 'scene_count'>('name')
+  const [characterSortOrder, setCharacterSortOrder] = useState<'asc' | 'desc'>('asc')
   const [sceneFormData, setSceneFormData] = useState({
     scene_number: '',
     scene_name: '',
@@ -53,6 +63,156 @@ export default function ScriptBreakdown() {
     estimated_duration: '',
     complexity_rating: 3,
   })
+  
+  const [characterFormData, setCharacterFormData] = useState({
+    name: '',
+    description: '',
+    character_type: 'supporting' as 'lead' | 'supporting' | 'bit_part' | 'cameo' | 'background_extra',
+    age_range: '',
+    gender: '',
+    ethnicity: '',
+    wardrobe_notes: '',
+    makeup_notes: '',
+    special_requirements: '',
+  })
+
+  // Sort scenes based on current sort settings
+  const sortedScenes = [...scenes].sort((a, b) => {
+    let comparison = 0;
+    
+    if (sortBy === 'scene_number') {
+      // Natural sort for scene numbers (handles "1", "2", "10", "1A" correctly)
+      comparison = a.scene_number.localeCompare(b.scene_number, undefined, { numeric: true });
+    } else if (sortBy === 'place') {
+      comparison = (a.scene_type || '').localeCompare(b.scene_type || '');
+    } else if (sortBy === 'time') {
+      comparison = (a.time_of_day || '').localeCompare(b.time_of_day || '');
+    } else if (sortBy === 'location') {
+      comparison = (a.location_name || '').localeCompare(b.location_name || '');
+    } else if (sortBy === 'complexity') {
+      comparison = (a.complexity_rating || 0) - (b.complexity_rating || 0);
+    }
+    
+    return sortOrder === 'asc' ? comparison : -comparison;
+  });
+
+  // Extract unique characters from scenes
+  console.log('📊 Extracting characters from', scenes.length, 'scenes');
+  console.log('🔍 First scene data:', scenes[0]);
+  
+  const characters = scenes.reduce((acc: any[], scene) => {
+    if (scene.scene_characters && scene.scene_characters.length > 0) {
+      console.log(`Scene ${scene.scene_number} has ${scene.scene_characters.length} character links`);
+      scene.scene_characters.forEach((sc: any) => {
+        console.log('Character link:', sc);
+        if (sc.character && sc.character.name) {
+          const existing = acc.find(c => c.id === sc.character.id)
+          if (existing) {
+            existing.scenes.push({
+              sceneNumber: scene.scene_number,
+              sceneId: scene.id,
+              role: sc.role_type
+            })
+          } else {
+            acc.push({
+              id: sc.character.id,
+              name: sc.character.name,
+              description: sc.character.description || '',
+              character_type: sc.character.character_type || 'supporting',
+              age_range: sc.character.age_range || '',
+              gender: sc.character.gender || '',
+              ethnicity: sc.character.ethnicity || '',
+              wardrobe_notes: sc.character.wardrobe_notes || '',
+              makeup_notes: sc.character.makeup_notes || '',
+              special_requirements: sc.character.special_requirements || '',
+              scenes: [{
+                sceneNumber: scene.scene_number,
+                sceneId: scene.id,
+                role: sc.role_type
+              }]
+            })
+          }
+        }
+      })
+    }
+    return acc
+  }, [])
+
+  // Sort characters based on current sort settings
+  const sortedCharacters = [...characters].sort((a, b) => {
+    let comparison = 0;
+    
+    if (characterSortBy === 'name') {
+      comparison = a.name.localeCompare(b.name);
+    } else if (characterSortBy === 'scene_count') {
+      comparison = a.scenes.length - b.scenes.length;
+    }
+    
+    return characterSortOrder === 'asc' ? comparison : -comparison;
+  });
+
+  function handleViewCharacter(character: any) {
+    setSelectedCharacter(character)
+    setShowViewCharacter(true)
+  }
+
+  function handleEditCharacterClick(character: any) {
+    setSelectedCharacter(character)
+    setCharacterFormData({
+      name: character.name || '',
+      description: character.description || '',
+      character_type: character.character_type || 'supporting',
+      age_range: character.age_range || '',
+      gender: character.gender || '',
+      ethnicity: character.ethnicity || '',
+      wardrobe_notes: character.wardrobe_notes || '',
+      makeup_notes: character.makeup_notes || '',
+      special_requirements: character.special_requirements || '',
+    })
+    setShowEditCharacter(true)
+  }
+
+  async function handleUpdateCharacter(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedCharacter) return
+    
+    try {
+      setUpdatingCharacter(true)
+      setError(null)
+      
+      await updateCharacter(selectedCharacter.id, {
+        description: characterFormData.description || undefined,
+        character_type: characterFormData.character_type,
+        age_range: characterFormData.age_range || undefined,
+        gender: characterFormData.gender || undefined,
+        ethnicity: characterFormData.ethnicity || undefined,
+        wardrobe_notes: characterFormData.wardrobe_notes || undefined,
+        makeup_notes: characterFormData.makeup_notes || undefined,
+        special_requirements: characterFormData.special_requirements || undefined,
+      })
+      
+      setShowEditCharacter(false)
+      setSelectedCharacter(null)
+      await loadScenes()
+    } catch (err: any) {
+      console.error('Failed to update character:', err)
+      setError(err.message || 'Failed to update character')
+    } finally {
+      setUpdatingCharacter(false)
+    }
+  }
+
+  async function handleDeleteCharacter(characterId: string) {
+    if (!confirm('Are you sure you want to delete this character?')) return
+    
+    try {
+      await deleteCharacter(characterId)
+      await loadScenes()
+    } catch (err: any) {
+      console.error('Failed to delete character:', err)
+      setError(err.message || 'Failed to delete character')
+    }
+  }
 
   useEffect(() => {
     loadProjects()
@@ -236,16 +396,31 @@ export default function ScriptBreakdown() {
       setUploading(true)
       setError(null)
       
-      // TODO: Implement actual file upload and script parsing
-      // This would typically:
-      // 1. Upload file to storage (Supabase Storage)
-      // 2. Send to AI service for parsing
-      // 3. Create scenes from parsed data
+      const formData = new FormData()
+      formData.append('file', uploadedFile)
+      formData.append('projectId', selectedProjectId)
       
-      alert(`File "${uploadedFile.name}" ready for upload. AI script parsing will be implemented in a future update.`)
+      const response = await fetch('/api/parse-script', {
+        method: 'POST',
+        body: formData,
+      })
       
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to parse script')
+      }
+      
+      // Success!
       setShowUpload(false)
       setUploadedFile(null)
+      
+      // Reload scenes
+      await loadScenes()
+      await loadStats()
+      
+      // Show success message
+      alert(`Successfully parsed ${result.scenesCreated} scenes from the script!`)
     } catch (err: any) {
       console.error('Failed to upload script:', err)
       setError(err.message || 'Failed to upload script')
@@ -413,6 +588,32 @@ export default function ScriptBreakdown() {
               </div>
             </div>
 
+            {/* Tabs for Scenes and Characters */}
+            {scenes.length > 0 && (
+              <div className="flex border-b border-border mb-6">
+                <button
+                  onClick={() => setActiveTab('scenes')}
+                  className={`px-6 py-3 font-medium text-sm transition-colors ${
+                    activeTab === 'scenes'
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Scenes ({scenes.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('characters')}
+                  className={`px-6 py-3 font-medium text-sm transition-colors ${
+                    activeTab === 'characters'
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Characters ({characters.length})
+                </button>
+              </div>
+            )}
+
             {/* Scene Breakdown Table */}
             {scenes.length === 0 ? (
               <div className="text-center py-12">
@@ -428,16 +629,38 @@ export default function ScriptBreakdown() {
                   Add First Scene
                 </button>
               </div>
-            ) : (
+            ) : activeTab === 'scenes' ? (
               <div className="rounded-lg border bg-card text-card-foreground shadow-soft overflow-hidden mb-8">
-                <div className="px-6 py-4 border-b">
+                <div className="px-6 py-4 border-b flex items-center justify-between">
                   <h3 className="text-lg font-medium">Scene Breakdown ({scenes.length} scenes)</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Sort by:</span>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as any)}
+                      className="px-3 py-1 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="scene_number">Scene Number</option>
+                      <option value="place">Place (INT/EXT)</option>
+                      <option value="time">Time (Day/Night)</option>
+                      <option value="location">Location</option>
+                      <option value="complexity">Complexity</option>
+                    </select>
+                    <button
+                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-3 py-1 border border-input bg-background rounded-md text-sm hover:bg-accent transition-colors"
+                    >
+                      {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+                    </button>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-border">
                     <thead className="bg-muted/50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Scene</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Place</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Time</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Location</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Description</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
@@ -446,15 +669,16 @@ export default function ScriptBreakdown() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {scenes.map((scene) => (
+                      {sortedScenes.map((scene) => (
                         <tr key={scene.id} className="hover:bg-muted/50 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium">
-                              {scene.scene_number}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {scene.scene_type?.toUpperCase()} • {scene.time_of_day?.toUpperCase()}
-                            </div>
+                            <div className="text-sm font-medium">{scene.scene_number}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{scene.scene_type?.toUpperCase()}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{scene.time_of_day?.toUpperCase()}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm">{scene.location_name || 'N/A'}</div>
@@ -493,6 +717,119 @@ export default function ScriptBreakdown() {
                             </button>
                             <button 
                               onClick={() => handleDeleteScene(scene.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              /* Character Breakdown Table */
+              <div className="rounded-lg border bg-card text-card-foreground shadow-soft overflow-hidden mb-8">
+                <div className="px-6 py-4 border-b flex items-center justify-between">
+                  <h3 className="text-lg font-medium">Character Breakdown ({characters.length} characters)</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Sort by:</span>
+                    <select
+                      value={characterSortBy}
+                      onChange={(e) => setCharacterSortBy(e.target.value as any)}
+                      className="px-3 py-1 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      <option value="name">Name</option>
+                      <option value="scene_count">Scene Count</option>
+                    </select>
+                    <button
+                      onClick={() => setCharacterSortOrder(characterSortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-3 py-1 border border-input bg-background rounded-md text-sm hover:bg-accent transition-colors"
+                    >
+                      {characterSortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-border">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Character</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Priority</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Age Range</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Gender</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Ethnicity</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Description</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Wardrobe Notes</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Makeup Notes</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Special Requirements</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Scene Count</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Scenes</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {sortedCharacters.map((character) => (
+                        <tr key={character.id} className="hover:bg-muted/50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium">{character.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{character.character_type?.toUpperCase().replace('_', ' ') || 'SUPPORTING'}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{character.age_range || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{character.gender || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm">{character.ethnicity || 'N/A'}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm max-w-xs truncate">
+                              {character.description || 'No description'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm max-w-xs truncate">
+                              {character.wardrobe_notes || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm max-w-xs truncate">
+                              {character.makeup_notes || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm max-w-xs truncate">
+                              {character.special_requirements || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {character.scenes.length} scene{character.scenes.length !== 1 ? 's' : ''}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-muted-foreground max-w-xs truncate">
+                              {character.scenes.map((s: any) => s.sceneNumber).join(', ')}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                            <button 
+                              onClick={() => handleViewCharacter(character)}
+                              className="text-primary hover:text-primary/80"
+                            >
+                              View
+                            </button>
+                            <button 
+                              onClick={() => handleEditCharacterClick(character)}
+                              className="text-muted-foreground hover:text-foreground"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteCharacter(character.id)}
                               className="text-red-600 hover:text-red-700"
                             >
                               Delete
@@ -794,6 +1131,241 @@ export default function ScriptBreakdown() {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Character Modal */}
+        {showViewCharacter && selectedCharacter && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">{selectedCharacter.name}</h3>
+                <button
+                  onClick={() => {
+                    setShowViewCharacter(false)
+                    setSelectedCharacter(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-2xl">×</span>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Priority</h5>
+                    <p className="text-gray-900">{selectedCharacter.character_type?.toUpperCase().replace('_', ' ') || 'SUPPORTING'}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Scene Count</h5>
+                    <p className="text-gray-900">{selectedCharacter.scenes.length} scene{selectedCharacter.scenes.length !== 1 ? 's' : ''}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Age Range</h5>
+                    <p className="text-gray-900">{selectedCharacter.age_range || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Gender</h5>
+                    <p className="text-gray-900">{selectedCharacter.gender || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Ethnicity</h5>
+                    <p className="text-gray-900">{selectedCharacter.ethnicity || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-1">Scenes</h5>
+                    <p className="text-gray-900">{selectedCharacter.scenes.map((s: any) => s.sceneNumber).join(', ')}</p>
+                  </div>
+                </div>
+
+                {selectedCharacter.description && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Description</h5>
+                    <p className="text-gray-900">{selectedCharacter.description}</p>
+                  </div>
+                )}
+
+                {selectedCharacter.wardrobe_notes && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Wardrobe Notes</h5>
+                    <p className="text-gray-900">{selectedCharacter.wardrobe_notes}</p>
+                  </div>
+                )}
+
+                {selectedCharacter.makeup_notes && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Makeup Notes</h5>
+                    <p className="text-gray-900">{selectedCharacter.makeup_notes}</p>
+                  </div>
+                )}
+
+                {selectedCharacter.special_requirements && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-700 mb-2">Special Requirements</h5>
+                    <p className="text-gray-900">{selectedCharacter.special_requirements}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setShowViewCharacter(false)
+                    handleEditCharacterClick(selectedCharacter)
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Edit Character
+                </button>
+                <button
+                  onClick={() => {
+                    setShowViewCharacter(false)
+                    setSelectedCharacter(null)
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Character Modal */}
+        {showEditCharacter && selectedCharacter && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
+              <h3 className="text-lg font-semibold mb-4">Edit Character: {selectedCharacter.name}</h3>
+              
+              <form onSubmit={handleUpdateCharacter}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Character Name</label>
+                    <input
+                      type="text"
+                      disabled
+                      value={characterFormData.name}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Character name cannot be edited</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <select
+                      value={characterFormData.character_type}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, character_type: e.target.value as any })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="lead">Lead</option>
+                      <option value="supporting">Supporting</option>
+                      <option value="bit_part">Bit Part</option>
+                      <option value="cameo">Cameo</option>
+                      <option value="background_extra">Background/Extra</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
+                    <input
+                      type="text"
+                      value={characterFormData.age_range}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, age_range: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="20-30"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                    <input
+                      type="text"
+                      value={characterFormData.gender}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, gender: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="M/F/NB"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ethnicity</label>
+                    <input
+                      type="text"
+                      value={characterFormData.ethnicity}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, ethnicity: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Any"
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      value={characterFormData.description}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, description: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Character description..."
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Wardrobe Notes</label>
+                    <textarea
+                      value={characterFormData.wardrobe_notes}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, wardrobe_notes: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Wardrobe requirements and notes..."
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Makeup Notes</label>
+                    <textarea
+                      value={characterFormData.makeup_notes}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, makeup_notes: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Makeup requirements and notes..."
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Special Requirements</label>
+                    <textarea
+                      value={characterFormData.special_requirements}
+                      onChange={(e) => setCharacterFormData({ ...characterFormData, special_requirements: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Special requirements..."
+                    />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditCharacter(false)
+                      setSelectedCharacter(null)
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    disabled={updatingCharacter}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={updatingCharacter}
+                  >
+                    {updatingCharacter ? 'Updating...' : 'Update Character'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

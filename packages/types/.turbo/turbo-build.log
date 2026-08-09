@@ -2,30 +2,65 @@
 > @plotops/types@1.0.0 build /Users/benjaminbruton/Desktop/PlotOps/packages/types
 > tsc
 
-../../apps/web/src/app/api/parse-script/route.ts(26,27): error TS2339: Property 'get' does not exist on type 'FormData'.
-../../apps/web/src/app/api/parse-script/route.ts(27,32): error TS2339: Property 'get' does not exist on type 'FormData'.
+../../apps/web/src/app/api/list-models/route.ts(8,32): error TS2339: Property 'listModels' does not exist on type 'GoogleGenerativeAI'.
+../../apps/web/src/app/api/list-models/route.ts(11,26): error TS7006: Parameter 'm' implicitly has an 'any' type.
+../../apps/web/src/app/api/parse-script/route.ts(38,27): error TS2339: Property 'get' does not exist on type 'FormData'.
+../../apps/web/src/app/api/parse-script/route.ts(39,32): error TS2339: Property 'get' does not exist on type 'FormData'.
 ../../apps/web/src/app/api/test-connection/route.ts(2,26): error TS2307: Cannot find module '@/lib/supabase' or its corresponding type declarations.
-../../apps/web/src/components/layout/app-layout.tsx(205,11): error TS2322: Type 'import("/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/@types+react@18.2.0/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+../../apps/web/src/components/layout/app-layout.tsx(283,11): error TS2322: Type 'import("/Users/benjaminbruton/Desktop/PlotOps/node_modules/.pnpm/@types+react@18.2.0/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
   Type 'ReactElement<any, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
     Property 'children' is missing in type 'ReactElement<any, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(6,26): error TS2307: Cannot find module '@/lib/supabase' or its corresponding type declarations.
+../../apps/web/src/components/layout/dashboard-layout.tsx(51,12): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(52,13): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(57,13): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(81,20): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(86,21): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(91,20): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(96,21): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(102,20): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/dashboard-layout.tsx(107,21): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+  Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
 ../../apps/web/src/components/layout/sidebar.tsx(6,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
-../../apps/web/src/components/layout/sidebar.tsx(95,12): error TS2786: 'Film' cannot be used as a JSX component.
+../../apps/web/src/components/layout/sidebar.tsx(7,26): error TS2307: Cannot find module '@/lib/supabase' or its corresponding type declarations.
+../../apps/web/src/components/layout/sidebar.tsx(124,12): error TS2786: 'Film' cannot be used as a JSX component.
   Its return type 'ReactNode' is not a valid JSX element.
     Type 'undefined' is not assignable to type 'Element | null'.
-../../apps/web/src/components/layout/sidebar.tsx(109,22): error TS2786: 'Link' cannot be used as a JSX component.
+../../apps/web/src/components/layout/sidebar.tsx(138,22): error TS2786: 'Link' cannot be used as a JSX component.
   Its return type 'ReactNode' is not a valid JSX element.
     Type 'undefined' is not assignable to type 'Element | null'.
-../../apps/web/src/components/layout/sidebar.tsx(118,23): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+../../apps/web/src/components/layout/sidebar.tsx(147,23): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
   Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
-../../apps/web/src/components/layout/sidebar.tsx(118,24): error TS2786: 'item.icon' cannot be used as a JSX component.
+../../apps/web/src/components/layout/sidebar.tsx(147,24): error TS2786: 'item.icon' cannot be used as a JSX component.
   Its return type 'ReactNode' is not a valid JSX element.
     Type 'undefined' is not assignable to type 'Element | null'.
-../../apps/web/src/components/layout/sidebar.tsx(129,14): error TS2786: 'Link' cannot be used as a JSX component.
+../../apps/web/src/components/layout/sidebar.tsx(165,20): error TS2786: 'User' cannot be used as a JSX component.
   Its return type 'ReactNode' is not a valid JSX element.
     Type 'undefined' is not assignable to type 'Element | null'.
-../../apps/web/src/components/layout/sidebar.tsx(138,15): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
+../../apps/web/src/components/layout/sidebar.tsx(168,18): error TS2786: 'ChevronUp' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(178,22): error TS2786: 'Link' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(183,23): error TS2322: Type 'Element' is not assignable to type 'ReactNode'.
   Property 'children' is missing in type 'ReactElement<any, any>' but required in type 'ReactPortal'.
-../../apps/web/src/components/layout/sidebar.tsx(138,16): error TS2786: 'Settings' cannot be used as a JSX component.
+../../apps/web/src/components/layout/sidebar.tsx(183,24): error TS2786: 'User' cannot be used as a JSX component.
+  Its return type 'ReactNode' is not a valid JSX element.
+    Type 'undefined' is not assignable to type 'Element | null'.
+../../apps/web/src/components/layout/sidebar.tsx(190,24): error TS2786: 'LogOut' cannot be used as a JSX component.
   Its return type 'ReactNode' is not a valid JSX element.
     Type 'undefined' is not assignable to type 'Element | null'.
 ../../apps/web/src/components/ui/button.tsx(4,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.

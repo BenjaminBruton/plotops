@@ -22,6 +22,8 @@ export interface Scene {
   is_insert?: boolean;
   script_page_start?: number;
   script_page_end?: number;
+  shoot_date?: string;
+  status?: 'not_scheduled' | 'scheduled' | 'in_progress' | 'completed' | 'needs_reshoot';
   created_at: string;
   updated_at: string;
 }
@@ -35,6 +37,12 @@ export interface SceneWithDetails extends Scene {
  * Get all scenes for a project
  */
 export async function getScenes(projectId: string) {
+  console.log('🔍 Fetching scenes for project:', projectId);
+  
+  // Check if user is authenticated
+  const { data: { user } } = await supabase.auth.getUser();
+  console.log('👤 Current user:', user?.id || 'NOT AUTHENTICATED');
+  
   const { data, error } = await supabase
     .from('scenes')
     .select(
@@ -55,10 +63,12 @@ export async function getScenes(projectId: string) {
     .order('scene_number', { ascending: true });
 
   if (error) {
-    console.error('Error fetching scenes:', error);
+    console.error('❌ Error fetching scenes:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     throw error;
   }
 
+  console.log(`✅ Fetched ${data?.length || 0} scenes`);
   return data;
 }
 
@@ -167,8 +177,8 @@ export async function getSceneStats(projectId: string) {
 
   const intScenes = scenes?.filter((s: any) => s.scene_type === 'int').length || 0;
   const extScenes = scenes?.filter((s: any) => s.scene_type === 'ext').length || 0;
-  const dayScenes = scenes?.filter((s: any) => s.scene_type === 'day').length || 0;
-  const nightScenes = scenes?.filter((s: any) => s.scene_type === 'night').length || 0;
+  const dayScenes = scenes?.filter((s: any) => s.time_of_day === 'day').length || 0;
+  const nightScenes = scenes?.filter((s: any) => s.time_of_day === 'night').length || 0;
 
   const complexityDistribution = {
     1: scenes?.filter((s: any) => s.complexity_rating === 1).length || 0,
@@ -248,6 +258,72 @@ export async function addPropToScene(
 
   if (error) {
     console.error('Error adding prop to scene:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Remove a character from a scene
+ */
+export async function removeCharacterFromScene(sceneCharacterId: string) {
+  const { error } = await supabase
+    .from('scene_characters')
+    .delete()
+    .eq('id', sceneCharacterId);
+
+  if (error) {
+    console.error('Error removing character from scene:', error);
+    throw error;
+  }
+}
+
+/**
+ * Remove a prop from a scene
+ */
+export async function removePropFromScene(scenePropId: string) {
+  const { error } = await supabase
+    .from('scene_props')
+    .delete()
+    .eq('id', scenePropId);
+
+  if (error) {
+    console.error('Error removing prop from scene:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all characters for a project
+ */
+export async function getCharacters(projectId: string) {
+  const { data, error } = await supabase
+    .from('characters')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching characters:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Get all props for a project
+ */
+export async function getProps(projectId: string) {
+  const { data, error } = await supabase
+    .from('props')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching props:', error);
     throw error;
   }
 

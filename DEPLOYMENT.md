@@ -9,7 +9,6 @@ PlotOps production deployment consists of:
 - **Web Application**: Next.js app deployed to Vercel/Netlify
 - **Mobile Application**: React Native app distributed via Expo EAS
 - **Database**: Supabase hosted PostgreSQL with real-time features
-- **Automation**: n8n workflows (self-hosted or cloud)
 - **Caching**: Redis Cloud for session and data caching
 - **Storage**: Supabase Storage for files and assets
 - **CDN**: Automatic via deployment platforms
@@ -50,9 +49,9 @@ PlotOps production deployment consists of:
 3. **Configure Row Level Security (RLS)**
    ```sql
    -- Enable RLS on all tables
-   ALTER TABLE plotops.organizations ENABLE ROW LEVEL SECURITY;
-   ALTER TABLE plotops.user_profiles ENABLE ROW LEVEL SECURITY;
-   ALTER TABLE plotops.projects ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
    -- ... (repeat for all tables)
    
    -- Create RLS policies (see security section)
@@ -82,9 +81,6 @@ PlotOps production deployment consists of:
    GOOGLE_MAPS_API_KEY=your-google-maps-key
    OPENWEATHER_API_KEY=your-weather-key
    
-   # n8n Integration
-   N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook
-   N8N_API_KEY=your-n8n-api-key
    
    # Email/SMS
    SENDGRID_API_KEY=your-sendgrid-key
@@ -207,49 +203,6 @@ PlotOps production deployment consists of:
    ALTER PUBLICATION supabase_realtime ADD TABLE plotops.project_members;
    ```
 
-### n8n Automation Setup
-
-1. **Self-Hosted n8n**
-   ```yaml
-   # docker-compose.production.yml
-   version: '3.8'
-   services:
-     n8n:
-       image: n8nio/n8n:latest
-       environment:
-         - N8N_BASIC_AUTH_ACTIVE=true
-         - N8N_BASIC_AUTH_USER=${N8N_USER}
-         - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-         - N8N_HOST=${N8N_HOST}
-         - N8N_PORT=5678
-         - N8N_PROTOCOL=https
-         - NODE_ENV=production
-         - WEBHOOK_URL=https://${N8N_HOST}/
-         - GENERIC_TIMEZONE=UTC
-       volumes:
-         - n8n_data:/home/node/.n8n
-       ports:
-         - "5678:5678"
-       restart: unless-stopped
-   ```
-
-2. **Import Workflows**
-   ```bash
-   # Import pre-built workflows
-   n8n import:workflow --input=services/n8n-workflows/call-sheet-generation.json
-   n8n import:workflow --input=services/n8n-workflows/script-parsing.json
-   n8n import:workflow --input=services/n8n-workflows/notifications.json
-   ```
-
-3. **Configure Webhooks**
-   ```javascript
-   // Webhook endpoints for PlotOps integration
-   const webhooks = {
-     callSheetGeneration: `${N8N_URL}/webhook/call-sheet`,
-     scriptParsing: `${N8N_URL}/webhook/script-parse`,
-     notifications: `${N8N_URL}/webhook/notify`
-   };
-   ```
 
 ### Redis Cache Setup
 
@@ -287,7 +240,6 @@ PlotOps production deployment consists of:
    # Use platform-specific secret management
    # Vercel: Environment Variables dashboard
    # Expo: EAS Secrets
-   # n8n: Environment variables or Docker secrets
    ```
 
 2. **API Key Rotation**
@@ -553,7 +505,6 @@ jobs:
    # .env.development
    NEXT_PUBLIC_SUPABASE_URL=http://localhost:8000
    NEXT_PUBLIC_SUPABASE_ANON_KEY=local-anon-key
-   N8N_WEBHOOK_URL=http://localhost:5678/webhook
    ```
 
 2. **Staging**
@@ -561,7 +512,6 @@ jobs:
    # .env.staging
    NEXT_PUBLIC_SUPABASE_URL=https://staging-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=staging-anon-key
-   N8N_WEBHOOK_URL=https://staging-n8n.yourdomain.com/webhook
    ```
 
 3. **Production**
@@ -569,7 +519,6 @@ jobs:
    # .env.production
    NEXT_PUBLIC_SUPABASE_URL=https://prod-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=prod-anon-key
-   N8N_WEBHOOK_URL=https://n8n.yourdomain.com/webhook
    ```
 
 ### Branch Strategy
@@ -683,7 +632,6 @@ export default function handler(req, res) {
     services: {
       database: await checkDatabase(),
       storage: await checkStorage(),
-      n8n: await checkN8n(),
       redis: await checkRedis()
     }
   };
@@ -724,7 +672,6 @@ export default function handler(req, res) {
 - [ ] Check performance metrics
 - [ ] Validate real-time features
 - [ ] Test mobile app updates
-- [ ] Verify n8n workflows
 
 ### Rollback Plan
 

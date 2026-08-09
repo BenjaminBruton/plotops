@@ -1,23 +1,32 @@
 # AI Script Parsing Setup Guide
 
 ## Overview
-This guide explains how to set up GPT-4o-mini for automatic script parsing in PlotOps.
+This guide explains how to set up Google Gemini 1.5 Pro for automatic script parsing in PlotOps.
 
-## Cost Analysis
-- **Model**: GPT-4o-mini
-- **Input**: ~$0.15 per 1M tokens
-- **Output**: ~$0.60 per 1M tokens
-- **Average screenplay (120 pages)**: ~$0.05-0.10 per script
-- **1,000 scripts/month**: ~$50-100
+## Current Model: Gemini 1.5 Pro (Premium Configuration)
+- **Model**: `gemini-1.5-pro-latest`
+- **Context Window**: 2M tokens (handles very long scripts with ease)
+- **Temperature**: 0.1 (low for consistent, accurate parsing)
+- **Max Output Tokens**: 8192 (supports detailed scene breakdowns)
+- **Cost**: ~$7/1M input tokens, ~$21/1M output tokens
+- **Average screenplay (120 pages)**: ~$0.20-0.40 per script
+- **1,000 scripts/month**: ~$200-400
+
+### Why Gemini 1.5 Pro?
+✅ **Massive Context Window**: Can process entire feature-length scripts (150+ pages) without truncation  
+✅ **Superior Accuracy**: Best-in-class scene detection and character/prop extraction  
+✅ **Consistent Output**: Low temperature ensures reliable JSON formatting  
+✅ **Long Output Support**: 8K token output handles complex breakdowns  
+✅ **Cost-Effective**: Infrequent use makes premium pricing acceptable
 
 ## Prerequisites
-1. OpenAI API account
-2. OpenAI API key with billing enabled
+1. Google AI Studio account (free to start)
+2. Google Gemini API key with billing enabled
 3. pnpm or npm installed
 
-## Step 1: Install OpenAI SDK
+## Step 1: Install Google Generative AI SDK
 
-The openai package has already been added to `apps/web/package.json`. Install dependencies:
+The `@google/generative-ai` package has already been added to `apps/web/package.json`. Install dependencies:
 
 ```bash
 pnpm install
@@ -27,29 +36,29 @@ If installation fails, you can manually install just for the web app:
 
 ```bash
 cd apps/web
-npm install openai@^4.20.0
+npm install @google/generative-ai
 ```
 
 ## Step 2: Set Up Environment Variables
 
 ### Add to `apps/web/.env.local`:
 ```env
-OPENAI_API_KEY=sk-your-api-key-here
+GEMINI_API_KEY=your-api-key-here
 ```
 
-### Add to `.env.example`:
+### Add to `.env.example` (if not already there):
 ```env
-# OpenAI API Configuration (for AI script parsing)
-OPENAI_API_KEY=sk-...
+# Google Gemini API Configuration (for AI script parsing)
+GEMINI_API_KEY=your-key-here
 ```
 
-## Step 3: Get Your OpenAI API Key
+## Step 3: Get Your Google Gemini API Key
 
-1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
-2. Sign in or create an account
-3. Click "Create new secret key"
-4. Copy the key (starts with `sk-`)
-5. Add it to your `.env.local` file
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Get API Key" or "Create API Key"
+4. Copy the key
+5. Add it to your `apps/web/.env.local` file
 
 ## Step 4: Update Frontend to Call Parsing API
 
@@ -173,23 +182,34 @@ To customize how the AI parses scripts, edit the system prompt in `/apps/web/src
 
 ## Troubleshooting
 
-### "Cannot find module 'openai'"
-Run `pnpm install` or manually install openai in apps/web
+### "Cannot find module '@google/generative-ai'"
+Run `pnpm install` or manually install the package in apps/web:
+```bash
+cd apps/web
+npm install @google/generative-ai
+```
 
-### "Invalid API key"
-1. Check that OPENAI_API_KEY is set in `.env.local`
-2. Verify the key starts with `sk-`
-3. Restart the development server
+### "Invalid API key" or "API key not valid"
+1. Check that `GEMINI_API_KEY` is set in `apps/web/.env.local`
+2. Verify you copied the entire key from Google AI Studio
+3. Restart the development server (important!)
+4. Ensure there are no extra spaces or quotes around the key
 
-### "Insufficient credits"
-1. Go to [OpenAI Billing](https://platform.openai.com/account/billing)
-2. Add payment method
-3. Purchase credits ($5 minimum)
+### "Quota exceeded" or "Insufficient credits"
+1. Go to [Google Cloud Console](https://console.cloud.google.com/billing)
+2. Enable billing for your project
+3. Gemini 1.5 Pro is paid - ensure your billing account is active
+4. Check your usage limits and quotas
 
-### Parsing takes too long
-- Average screenplay: 10-30 seconds
-- Large scripts (150+ pages): up to 60 seconds
-- Consider adding a progress indicator
+### Parsing takes longer than expected
+- **Average screenplay (90-120 pages)**: 15-40 seconds with Gemini 1.5 Pro
+- **Long scripts (150+ pages)**: 45-90 seconds
+- **Epic scripts (180+ pages)**: May take up to 2 minutes
+- The improved accuracy is worth the slightly longer processing time
+- Consider adding a progress indicator for better UX
+
+### "Model not found" error
+Make sure you're using `gemini-1.5-pro-latest` - this automatically uses the newest version of Gemini 1.5 Pro
 
 ### Scenes not creating
 1. Check browser console for errors
@@ -197,26 +217,73 @@ Run `pnpm install` or manually install openai in apps/web
 3. Verify project ID is valid
 4. Check database connection
 
-## Alternative AI Models
+## Performance Notes
 
-If you want to use a different model:
+### Gemini 1.5 Pro vs. Flash
+The current configuration uses **Gemini 1.5 Pro** for maximum accuracy. Here's how it compares:
 
-### Google Gemini 1.5 Flash (FREE tier)
+| Feature | Gemini 1.5 Pro (Current) | Gemini 1.5 Flash |
+|---------|-------------------------|------------------|
+| Accuracy | ⭐⭐⭐⭐⭐ Excellent | ⭐⭐⭐⭐ Very Good |
+| Speed | 15-90 seconds | 5-20 seconds |
+| Context Window | 2M tokens | 1M tokens |
+| Cost per script | $0.20-0.40 | $0.02-0.05 |
+| Best For | Production, accuracy-critical | Development, testing |
+
+**Why we chose Pro:**
+- Infrequent use means cost is not a primary concern
+- Superior accuracy reduces manual corrections
+- Handles very long scripts (180+ pages) without issues
+- Consistent JSON output with fewer parsing errors
+
+### Switching to Gemini 1.5 Flash (if needed)
+
+If you want faster, cheaper parsing for development, change the model in `route.ts`:
+
 ```typescript
-// Install: npm install @google/generative-ai
-import { GoogleGenerativeAI } from '@google/generative-ai'
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-1.5-flash-latest",  // Change this line
+  generationConfig: {
+    temperature: 0.1,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 8192,
+  },
+});
 ```
 
-### Anthropic Claude 3.5 Haiku
+## Alternative AI Models
+
+### Anthropic Claude 3.5 Sonnet (Premium Alternative)
 ```typescript
 // Install: npm install @anthropic-ai/sdk
 import Anthropic from '@anthropic-ai/sdk'
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
+})
+
+const message = await client.messages.create({
+  model: "claude-3-5-sonnet-20241022",
+  max_tokens: 8192,
+  temperature: 0.1,
+  messages: [{ role: "user", content: prompt }]
+})
+```
+
+### OpenAI GPT-4o (Alternative)
+```typescript
+// Install: npm install openai
+import OpenAI from 'openai'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+const completion = await openai.chat.completions.create({
+  model: "gpt-4o",
+  messages: [{ role: "user", content: prompt }],
+  temperature: 0.1
 })
 ```
 
@@ -242,29 +309,28 @@ const client = new Anthropic({
 
 ## Cost Optimization Tips
 
-1. **Cache parsed scripts**: Store results to avoid re-parsing
-2. **Batch processing**: Parse multiple scripts in one request
-3. **Use cheaper models**: Start with gpt-4o-mini, upgrade if needed
-4. **Set token limits**: Limit max_tokens to control costs
-5. **Monitor usage**: Set up billing alerts in OpenAI dashboard
-6. **Compress prompts**: Remove unnecessary instructions
+1. **Cache parsed scripts**: Store results to avoid re-parsing (saves 100% of costs on re-uploads)
+2. **Consider Flash for development**: Use `gemini-1.5-flash-latest` during testing
+3. **Monitor usage**: Set up billing alerts in Google Cloud Console
+4. **Batch uploads**: If multiple projects need parsing, do them in one session
+5. **Validate scripts first**: Check format before sending to AI to avoid wasted calls
 
 ## Next Steps
 
-1. ✅ Install OpenAI SDK
-2. ✅ Set up API key
-3. ✅ Update frontend handler
+1. ✅ Gemini SDK installed
+2. ✅ API key configured
+3. ✅ Model upgraded to Gemini 1.5 Pro
 4. Test with sample screenplay
-5. Adjust AI prompt for better accuracy
-6. Add character and prop extraction
-7. Implement progress tracking
-8. Add error recovery
-9. Deploy to production
+5. Monitor accuracy and adjust prompt if needed
+6. Implement progress tracking for better UX
+7. Add error recovery and retry logic
+8. Deploy to production
 
 ## Support
 
 For issues:
-1. Check the [OpenAI documentation](https://platform.openai.com/docs)
-2. Review server logs
-3. Test with the OpenAI playground first
+1. Check the [Google AI documentation](https://ai.google.dev/docs)
+2. Review server logs (look for Gemini API errors)
+3. Test with Google AI Studio first
 4. Check the PlotOps repository issues
+5. Verify your Gemini API key has billing enabled

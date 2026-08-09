@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { supabase } from "@/lib/supabase"
 import { 
   Film, 
   Users, 
@@ -15,7 +16,10 @@ import {
   Home,
   Clapperboard,
   UserCheck,
-  Clock
+  Clock,
+  User,
+  LogOut,
+  ChevronUp
 } from "lucide-react"
 
 const navigation = [
@@ -82,6 +86,31 @@ interface SidebarProps {
 
 export function Sidebar({ userRole = 'producer', className }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [userEmail, setUserEmail] = React.useState<string>('')
+  const [fullName, setFullName] = React.useState<string>('')
+  const [organization, setOrganization] = React.useState<string>('')
+  const [showUserMenu, setShowUserMenu] = React.useState(false)
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserEmail(user.email || '')
+        setFullName(user.user_metadata?.full_name || '')
+        setOrganization(user.user_metadata?.organization || '')
+      }
+    }
+    getUser()
+  }, [])
+
+  // Determine display name: organization > full_name > email
+  const displayName = organization || fullName || userEmail || 'User'
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   const filteredNavigation = navigation.filter(item => 
     item.roles.includes('all') || item.roles.includes(userRole)
@@ -124,20 +153,47 @@ export function Sidebar({ userRole = 'producer', className }: SidebarProps) {
             </ul>
           </li>
           
-          {/* Settings at bottom */}
+          {/* User menu at bottom */}
           <li className="mt-auto">
-            <Link
-              href="/settings"
-              className={cn(
-                pathname === '/settings'
-                  ? 'bg-gray-800 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800',
-                'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors'
+            <div className="relative">
+              {/* User dropdown trigger */}
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-full group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-700">
+                  <User className="h-5 w-5" />
+                </div>
+                <span className="flex-1 text-left truncate">{displayName}</span>
+                <ChevronUp className={cn(
+                  "h-5 w-5 transition-transform",
+                  showUserMenu ? "rotate-180" : ""
+                )} />
+              </button>
+
+              {/* Dropdown menu */}
+              {showUserMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    <Link
+                      href="/account"
+                      className="flex items-center gap-x-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Account Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-x-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
               )}
-            >
-              <Settings className="h-6 w-6 shrink-0" aria-hidden="true" />
-              Settings
-            </Link>
+            </div>
           </li>
         </ul>
       </nav>

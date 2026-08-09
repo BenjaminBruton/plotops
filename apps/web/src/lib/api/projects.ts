@@ -68,6 +68,25 @@ export async function getProject(projectId: string) {
 }
 
 /**
+ * Get basic project info by ID (without complex relationships)
+ * Useful when you just need the core project data
+ */
+export async function getBasicProject(projectId: string) {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', projectId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching basic project:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+/**
  * Create a new project
  */
 export async function createProject(project: {

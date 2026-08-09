@@ -1,13 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TalentLayout from '../../components/layout/talent-layout'
+import { getPublicCastingCalls } from '../../lib/api/public-casting'
 
 type JobType = 'all' | 'actor' | 'voiceover' | 'crew' | 'modeling'
 
 export default function JobBoard() {
   const [jobType, setJobType] = useState<JobType>('all')
+  const [castingCalls, setCastingCalls] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedCard, setExpandedCard] = useState<string | null>(null)
   const [location, setLocation] = useState('')
   const [radius, setRadius] = useState('25')
   const [distanceUnit, setDistanceUnit] = useState('miles')
@@ -44,36 +48,25 @@ export default function JobBoard() {
     )
   }
 
-  // Mock data
-  const castingCalls = [
-    {
-      id: '1',
-      project: 'The Heist',
-      role: 'Detective Martinez',
-      type: 'actor',
-      description: 'Lead detective investigating a bank heist. Strong, determined character with emotional depth.',
-      ageRange: '35-45',
-      gender: 'Any',
-      compensation: 'SAG Scale + Backend',
-      location: 'Los Angeles, CA',
-      deadline: '2024-02-28',
-      status: 'Open'
-    },
-    {
-      id: '2',
-      project: 'The Heist',
-      role: 'Sarah Chen - Tech Expert',
-      type: 'actor',
-      description: 'Brilliant hacker with social anxiety. Crucial to the heist team.',
-      ageRange: '25-35',
-      gender: 'Female',
-      compensation: 'SAG Scale',
-      location: 'Los Angeles, CA',
-      deadline: '2024-03-05',
-      status: 'Open'
-    }
-  ]
+  // Load casting calls on mount
+  useEffect(() => {
+    loadCastingCalls()
+  }, [])
 
+  async function loadCastingCalls() {
+    try {
+      setLoading(true)
+      const data = await getPublicCastingCalls()
+      console.log('Loaded public casting calls:', data)
+      setCastingCalls(data || [])
+    } catch (error) {
+      console.error('Failed to load casting calls:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Mock crew data (will be replaced with real data later)
   const crewPositions = [
     {
       id: '1',
@@ -369,10 +362,180 @@ export default function JobBoard() {
           )}
         </div>
 
-        {/* Results */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Results - Project Cards */}
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading casting calls...</p>
+          </div>
+        ) : castingCalls.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No casting calls available yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {castingCalls.map((castingCall) => {
+              const rolesCount = castingCall.characters?.length || 0
+              const crewCount = castingCall.crew_positions?.length || 0
+              
+              return (
+                <div
+                  key={castingCall.id}
+                  className="rounded-lg border bg-card shadow-soft hover:shadow-medium transition-all p-6"
+                >
+                  {/* Project Title */}
+                  <h3 className="text-xl font-bold mb-2">
+                    {castingCall.is_anonymous ? 'Film Production Casting Call' : castingCall.title}
+                  </h3>
+                  
+                  {/* Logline */}
+                  {castingCall.logline && (
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{castingCall.logline}</p>
+                  )}
+                  
+                  {/* Description */}
+                  {castingCall.description && (
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{castingCall.description}</p>
+                  )}
+                  
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 mb-4 py-3 border-y">
+                    {rolesCount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="text-sm font-medium">{rolesCount} {rolesCount === 1 ? 'Role' : 'Roles'}</span>
+                      </div>
+                    )}
+                    {crewCount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-sm font-medium">{crewCount} Crew {crewCount === 1 ? 'Position' : 'Positions'}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Shooting Dates */}
+                  {(castingCall.shooting_start_date || castingCall.shooting_end_date) && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span>
+                        {castingCall.shooting_start_date && new Date(castingCall.shooting_start_date).toLocaleDateString()}
+                        {castingCall.shooting_end_date && ` - ${new Date(castingCall.shooting_end_date).toLocaleDateString()}`}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Expand/Collapse Button */}
+                  <button
+                    onClick={() => setExpandedCard(expandedCard === castingCall.id ? null : castingCall.id)}
+                    className="w-full inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 mt-4"
+                  >
+                    {expandedCard === castingCall.id ? 'Hide' : 'View'} Available Roles & Positions
+                    <svg className={`ml-2 h-4 w-4 transition-transform ${expandedCard === castingCall.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Expanded Content */}
+                  {expandedCard === castingCall.id && (
+                    <div className="mt-4 pt-4 border-t space-y-4">
+                      {/* Character Roles */}
+                      {castingCall.characters && castingCall.characters.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-3">🎭 Character Roles ({castingCall.characters.length})</h4>
+                          <div className="space-y-3">
+                            {castingCall.characters.map((character: any) => (
+                              <div key={character.id} className="rounded-lg border bg-muted/30 p-3">
+                                <div className="flex items-start justify-between mb-2">
+                                  <h5 className="font-semibold">{character.name}</h5>
+                                  {character.character_type && (
+                                    <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold bg-primary/10 text-primary">
+                                      {character.character_type}
+                                    </span>
+                                  )}
+                                </div>
+                                {character.description && (
+                                  <p className="text-sm text-muted-foreground mb-2">{character.description}</p>
+                                )}
+                                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                  {character.age_range && <span>Age: {character.age_range}</span>}
+                                  {character.gender && <span>• Gender: {character.gender}</span>}
+                                  {character.ethnicity && <span>• Ethnicity: {character.ethnicity}</span>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Crew Positions */}
+                      {castingCall.crew_positions && castingCall.crew_positions.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold mb-3">🎬 Crew Positions ({castingCall.crew_positions.length})</h4>
+                          <div className="grid grid-cols-2 gap-2">
+                            {castingCall.crew_positions.map((position: any, index: number) => (
+                              <div key={index} className="rounded border bg-muted/20 p-2 text-sm">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium">{position.role}</span>
+                                  <span className="text-xs text-muted-foreground">×{position.count}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Contact Information */}
+                      <div className="pt-3 border-t">
+                        <h4 className="font-semibold mb-3 text-center">📧 Contact Information</h4>
+                        <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                          {castingCall.contact_name && (
+                            <div className="flex items-center gap-2">
+                              <svg className="h-4 w-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              <span className="text-sm font-medium">{castingCall.contact_name}</span>
+                            </div>
+                          )}
+                          {castingCall.contact_email && (
+                            <div className="flex items-center gap-2">
+                              <svg className="h-4 w-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              <a href={`mailto:${castingCall.contact_email}`} className="text-sm text-primary hover:underline">
+                                {castingCall.contact_email}
+                              </a>
+                            </div>
+                          )}
+                          {castingCall.contact_phone && (
+                            <div className="flex items-center gap-2">
+                              <svg className="h-4 w-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                              <a href={`tel:${castingCall.contact_phone}`} className="text-sm text-primary hover:underline">
+                                {castingCall.contact_phone}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* OLD Mock Data Display - REMOVED */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" style={{display: 'none'}}>
           {/* Casting Calls */}
-          {(jobType === 'all' || jobType === 'actor') && castingCalls.map((call) => (
+          {(jobType === 'all' || jobType === 'actor') && [].map((call: any) => (
             <div key={call.id} className="rounded-lg border bg-card shadow-soft hover:shadow-medium transition-all p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">

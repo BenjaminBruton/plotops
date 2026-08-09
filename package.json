@@ -20,17 +20,6 @@
     "mobile:ios": "pnpm --filter mobile ios",
     "mobile:android": "pnpm --filter mobile android",
     
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:clean": "docker-compose down -v --remove-orphans && docker system prune -f",
-    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
-    
-    "services:start": "docker-compose up -d supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage n8n redis",
-    "services:stop": "docker-compose stop",
-    "services:restart": "docker-compose restart",
-    "services:logs": "docker-compose logs -f supabase-db supabase-kong n8n",
-    
     "db:setup": "node tools/dev/setup-database.js",
     "db:migrate": "node tools/dev/migrate-database.js",
     "db:seed": "node tools/dev/seed-database.js",
@@ -38,20 +27,8 @@
     "db:backup": "node tools/dev/backup-database.js",
     "db:restore": "node tools/dev/restore-database.js",
     
-    "supabase:start": "docker-compose up -d supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage supabase-studio",
-    "supabase:stop": "docker-compose stop supabase-db supabase-kong supabase-auth supabase-rest supabase-realtime supabase-storage supabase-studio",
-    "supabase:studio": "open http://localhost:3001",
-    "supabase:logs": "docker-compose logs -f supabase-db supabase-kong supabase-auth supabase-rest",
-    
-    "n8n:start": "docker-compose up -d n8n",
-    "n8n:stop": "docker-compose stop n8n",
-    "n8n:open": "open http://localhost:5678",
-    "n8n:backup": "node tools/dev/backup-n8n.js",
-    "n8n:restore": "node tools/dev/restore-n8n.js",
-    
     "dev:setup": "node tools/dev/setup-environment.js",
     "dev:validate": "node tools/dev/validate-environment.js",
-    "dev:reset": "npm run docker:clean && npm run dev:setup",
     "dev:status": "node tools/dev/check-services.js",
     
     "env:copy": "cp .env.template .env",

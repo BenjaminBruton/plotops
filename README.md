@@ -16,7 +16,6 @@ PlotOps is a comprehensive film production ERP system designed to manage the com
 - **Role-Based Access Control (RBAC)**: Users are assigned specific roles (Producer, AD, Casting Director, Scout, Editor, Publicist) with unique dashboard views and permissions
 - **AI-Assisted, Human-Validated**: The system suggests and automates workflows, but every AI output is editable or deletable by users
 - **Real-Time Collaboration**: Built on Supabase for instant updates across all stakeholders
-- **Automation-First**: Leverages n8n for heavy lifting like PDF generation, script parsing, and notifications
 
 ## 🏗️ Architecture Overview
 
@@ -37,7 +36,6 @@ PlotOps/
 │   └── config/                # Configuration management
 ├── services/
 │   ├── supabase/              # Database schemas & migrations
-│   └── n8n-workflows/         # Automation workflows
 └── tools/
     └── dev/                   # Development utilities
 ```
@@ -46,7 +44,6 @@ PlotOps/
 
 - **Frontend**: Next.js 14 (web) + Expo (mobile)
 - **Backend**: Supabase (PostgreSQL + Auth + Storage + Realtime)
-- **Automation**: n8n workflows
 - **Styling**: Tailwind CSS + Shadcn UI
 - **Build System**: Turborepo + pnpm workspaces
 - **Maps**: Google Maps JavaScript API
@@ -60,8 +57,8 @@ Ensure you have the following installed:
 
 - **Node.js** 18+ ([Download](https://nodejs.org/))
 - **pnpm** 8+ (`npm install -g pnpm`)
-- **Docker** & **Docker Compose** ([Download](https://www.docker.com/))
 - **Git** ([Download](https://git-scm.com/))
+- **Supabase Account** ([Sign up](https://supabase.com/))
 
 ### Installation
 
@@ -76,24 +73,22 @@ Ensure you have the following installed:
    pnpm install
    ```
 
-3. **Set up the development environment**
+3. **Set up environment variables**
    ```bash
-   pnpm dev:setup
+   cp .env.example .env
    ```
    
-   This command will:
-   - Copy environment variables from template
-   - Generate secure keys
-   - Start Docker services
-   - Initialize the database
-   - Seed with sample data
+   Edit `.env` and add your Supabase credentials:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 
 4. **Validate the setup**
    ```bash
    pnpm dev:validate
    ```
 
-5. **Start developing**
+4. **Start developing**
    ```bash
    # Start the web application
    pnpm web:dev
@@ -107,11 +102,7 @@ Ensure you have the following installed:
 Once running, you can access:
 
 - **Web Application**: http://localhost:3000
-- **Supabase Studio**: http://localhost:3001 (Database management)
-- **n8n Workflows**: http://localhost:5678 (Automation)
-- **PgAdmin**: http://localhost:8080 (Database admin)
-- **Redis Commander**: http://localhost:8081 (Cache management)
-- **MailHog**: http://localhost:8025 (Email testing)
+- **Supabase Dashboard**: https://app.supabase.com (Database management)
 
 ## 🎭 Film Production Features
 
@@ -195,12 +186,6 @@ pnpm mobile:dev            # Start mobile application only
 pnpm mobile:ios            # Run on iOS simulator
 pnpm mobile:android        # Run on Android emulator
 
-# Docker Services
-pnpm docker:up             # Start all services
-pnpm docker:down           # Stop all services
-pnpm docker:logs           # View service logs
-pnpm services:restart      # Restart services
-
 # Database Management
 pnpm db:migrate            # Run database migrations
 pnpm db:seed               # Seed with sample data
@@ -227,20 +212,6 @@ pnpm build:mobile          # Build mobile application
 pnpm build:packages        # Build shared packages only
 ```
 
-### Docker Services
-
-The development environment includes these services:
-
-| Service | Port | Description |
-|---------|------|-------------|
-| **Supabase Database** | 5432 | PostgreSQL database |
-| **Supabase Studio** | 3001 | Database management UI |
-| **Supabase API** | 8000 | REST API, Auth, Storage |
-| **n8n** | 5678 | Workflow automation |
-| **Redis** | 6379 | Caching and sessions |
-| **PgAdmin** | 8080 | Database administration |
-| **Redis Commander** | 8081 | Redis management |
-| **MailHog** | 8025 | Email testing |
 
 ## 📦 Shared Packages
 
@@ -266,8 +237,6 @@ Date formatting, validation functions, business logic helpers, and cross-platfor
 Environment configuration, feature flags, service settings, and role-based permissions.
 
 ## 🔄 Automation Workflows
-
-PlotOps includes pre-built n8n workflows for common film production tasks:
 
 ### Call Sheet Generation
 - Pulls scene and cast data from database
@@ -330,7 +299,6 @@ The mobile application uses Expo Application Services (EAS) for:
 
 ### Infrastructure
 - **Database**: Supabase hosted PostgreSQL
-- **Automation**: n8n Cloud or self-hosted
 - **Caching**: Redis Cloud or self-hosted
 - **Storage**: Supabase Storage for files and assets
 
@@ -349,32 +317,25 @@ PlotOps implements enterprise-grade security:
 
 ### Common Issues
 
-**Services won't start**
-```bash
-pnpm dev:status          # Check service status
-pnpm docker:logs         # View service logs
-pnpm dev:reset           # Reset everything
-```
-
 **Database connection issues**
 ```bash
-pnpm db:migrate          # Run migrations
-pnpm services:restart    # Restart services
+# Check your .env file has correct Supabase credentials
+# Run migrations through Supabase dashboard SQL Editor
 ```
 
 **Environment validation fails**
 ```bash
-pnpm dev:validate        # Run detailed validation
-pnpm env:generate-keys   # Generate missing keys
+# Ensure all required environment variables are set
+cp .env.example .env
+# Edit .env with your Supabase credentials
 ```
 
 ### Getting Help
 
 1. **Check the documentation** in the `/docs` folder
-2. **Review error logs** with `pnpm docker:logs`
-3. **Validate your environment** with `pnpm dev:validate`
-4. **Reset your environment** with `pnpm dev:reset`
-5. **Create an issue** in the repository with error details
+2. **Verify Supabase credentials** in your `.env` file
+3. **Check Supabase dashboard** for database status
+4. **Create an issue** in the repository with error details
 
 ## 🎯 Roadmap
 
@@ -383,7 +344,7 @@ pnpm env:generate-keys   # Generate missing keys
 - [x] Database schema and migrations
 - [x] Authentication and RBAC
 - [x] Basic web and mobile applications
-- [x] Docker development environment
+- [x] Supabase integration
 
 ### Phase 2: Script & Breakdown Features
 - [ ] PDF/FDX script parsing

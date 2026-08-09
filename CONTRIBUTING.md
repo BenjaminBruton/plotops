@@ -10,9 +10,9 @@ Before contributing, ensure you have:
 
 - **Node.js** 18+ installed
 - **pnpm** 8+ installed
-- **Docker** and **Docker Compose** installed
 - **Git** configured with your name and email
 - A **GitHub account** with SSH keys set up
+- **Supabase Account** for database access
 
 ### Development Setup
 

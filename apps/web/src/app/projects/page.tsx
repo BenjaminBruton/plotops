@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import AppLayout from '../../components/layout/app-layout'
 import { getProjects, createProject, updateProject, getProjectStats } from '../../lib/api/projects'
+import { getSceneStats } from '../../lib/api/scenes'
 
 const statusColors = {
   development: "bg-gray-100 text-gray-800",
@@ -25,6 +26,7 @@ const statusLabels = {
 
 export default function Projects() {
   const [projects, setProjects] = useState<any[]>([])
+  const [projectSceneCounts, setProjectSceneCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -80,6 +82,20 @@ export default function Projects() {
       setError(null)
       const data = await getProjects()
       setProjects(data || [])
+      
+      // Load scene counts for each project
+      if (data && data.length > 0) {
+        const counts: Record<string, number> = {}
+        for (const project of data) {
+          try {
+            const stats = await getSceneStats(project.id)
+            counts[project.id] = stats.totalScenes || 0
+          } catch (err) {
+            counts[project.id] = 0
+          }
+        }
+        setProjectSceneCounts(counts)
+      }
     } catch (err: any) {
       console.error('Failed to load projects:', err)
       setError(err.message || 'Failed to load projects')
@@ -268,6 +284,39 @@ export default function Projects() {
                       <div className="text-sm text-gray-500 mb-4">
                         {project.start_date && <div>Start: {new Date(project.start_date).toLocaleDateString()}</div>}
                         {project.end_date && <div>End: {new Date(project.end_date).toLocaleDateString()}</div>}
+                      </div>
+                    )}
+
+                    {/* Quick Actions */}
+                    {projectSceneCounts[project.id] > 0 && (
+                      <div className="mb-4 pb-4 border-b border-gray-200">
+                        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">Quick Actions</h4>
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href="/script-breakdown"
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                          >
+                            📝 Script Breakdown ({projectSceneCounts[project.id]} scenes)
+                          </Link>
+                          <Link
+                            href="/casting"
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+                          >
+                            🎭 Casting
+                          </Link>
+                          <Link
+                            href="/stripboard"
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                          >
+                            📅 Stripboard
+                          </Link>
+                          <Link
+                            href="/locations"
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-orange-50 text-orange-700 hover:bg-orange-100 transition-colors"
+                          >
+                            📍 Locations
+                          </Link>
+                        </div>
                       </div>
                     )}
 

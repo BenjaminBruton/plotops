@@ -1,8 +1,3 @@
 {
-  "/not-found": "app/not-found.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/stripboard/page": "app/stripboard/page.js",
-  "/casting/page": "app/casting/page.js",
-  "/projects/page": "app/projects/page.js",
-  "/script-breakdown/page": "app/script-breakdown/page.js"
+  "/stripboard/page": "app/stripboard/page.js"
 }

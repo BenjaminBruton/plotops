@@ -8,9 +8,7 @@ AI-Assisted, Human-Validated: The system suggests (breaks down scripts, clusters
 
 State Management: Use Supabase for the real-time database to ensure "The Wrap" and "Daily Progress" updates are reflected instantly for all stakeholders.
 
-Automation Engine: Use n8n for heavy lifting like PDF generation (Call Sheets), Script Parsing (LLM), and notification triggers.
-
-2. Functional Modules & Workflows
+1. Functional Modules & Workflows
 A. Script Ingestion & Breakdown (Producer View)
 Input: PDF or .fdx file upload.
 
@@ -65,13 +63,11 @@ Database/Auth: Supabase (PostgreSQL + RLS).
 
 Styling: Tailwind CSS + Shadcn UI.
 
-Automations: n8n (hosted or self-hosted).
-
 Maps: Google Maps JavaScript API.
 
 State/Real-time: Supabase Realtime (for "The Wrap" notifications).
 
-4. Data Schema Strategy (For AI Developer)
+1. Data Schema Strategy (For AI Developer)
 The AI Agent should prioritize building these relational links:
 
 Project -> Scenes
