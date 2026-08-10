@@ -9,7 +9,8 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [user, setUser] = useState<any>(null)
-  const [fullName, setFullName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [organization, setOrganization] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
@@ -24,9 +25,21 @@ export default function AccountPage() {
 
       if (user) {
         setUser(user)
-        // For now, just set defaults. In production, you'd fetch from user_profiles table
-        setFullName(user.user_metadata?.full_name || '')
-        setOrganization(user.user_metadata?.organization || '')
+        
+        // Fetch user profile from database
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('first_name, last_name, organization_id, organizations(name)')
+          .eq('id', user.id)
+          .single()
+        
+        if (profile) {
+          setFirstName(profile.first_name || '')
+          setLastName(profile.last_name || '')
+          if (profile.organizations) {
+            setOrganization((profile.organizations as any).name || '')
+          }
+        }
       } else {
         router.push('/login')
       }
@@ -43,14 +56,42 @@ export default function AccountPage() {
       setSaving(true)
       setMessage(null)
 
-      const { error } = await supabase.auth.updateUser({
+      if (!user?.id) return
+
+      // Update user_profiles table
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName
+        })
+        .eq('id', user.id)
+
+      if (profileError) throw profileError
+
+      // Update organization name in organizations table
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.organization_id) {
+        const { error: orgError } = await supabase
+          .from('organizations')
+          .update({ name: organization })
+          .eq('id', profile.organization_id)
+
+        if (orgError) throw orgError
+      }
+
+      // Also update auth metadata for consistency
+      await supabase.auth.updateUser({
         data: {
-          full_name: fullName,
+          full_name: `${firstName} ${lastName}`.trim(),
           organization: organization,
         }
       })
-
-      if (error) throw error
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' })
     } catch (error: any) {
@@ -100,18 +141,33 @@ export default function AccountPage() {
                 <p className="mt-1 text-sm text-gray-500">Email cannot be changed</p>
               </div>
 
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
-                  placeholder="John Doe"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border"
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
 
               <div>

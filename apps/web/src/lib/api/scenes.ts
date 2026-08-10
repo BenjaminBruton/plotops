@@ -50,7 +50,22 @@ export async function getScenes(projectId: string) {
       *,
       scene_characters(
         id,
-        character:characters(id, name, character_type)
+        character:characters(
+          id, 
+          name, 
+          character_type, 
+          description, 
+          age_range, 
+          gender, 
+          ethnicity, 
+          wardrobe_notes, 
+          makeup_notes, 
+          special_requirements,
+          actor_name,
+          actor_phone,
+          actor_email,
+          actor_agency
+        )
       ),
       scene_props(
         id,
@@ -60,7 +75,7 @@ export async function getScenes(projectId: string) {
     `
     )
     .eq('project_id', projectId)
-    .order('scene_number', { ascending: true });
+    .order('scene_number', { ascending: true});
 
   if (error) {
     console.error('❌ Error fetching scenes:', error);

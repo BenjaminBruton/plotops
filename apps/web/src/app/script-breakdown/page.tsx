@@ -97,14 +97,9 @@ export default function ScriptBreakdown() {
   });
 
   // Extract unique characters from scenes
-  console.log('📊 Extracting characters from', scenes.length, 'scenes');
-  console.log('🔍 First scene data:', scenes[0]);
-  
   const characters = scenes.reduce((acc: any[], scene) => {
     if (scene.scene_characters && scene.scene_characters.length > 0) {
-      console.log(`Scene ${scene.scene_number} has ${scene.scene_characters.length} character links`);
       scene.scene_characters.forEach((sc: any) => {
-        console.log('Character link:', sc);
         if (sc.character && sc.character.name) {
           const existing = acc.find(c => c.id === sc.character.id)
           if (existing) {
@@ -180,23 +175,33 @@ export default function ScriptBreakdown() {
       setUpdatingCharacter(true)
       setError(null)
       
-      await updateCharacter(selectedCharacter.id, {
+      console.log('📝 Updating character:', selectedCharacter.name, 'with data:', characterFormData)
+      
+      const result = await updateCharacter(selectedCharacter.id, {
         description: characterFormData.description || undefined,
-        character_type: characterFormData.character_type,
         age_range: characterFormData.age_range || undefined,
         gender: characterFormData.gender || undefined,
         ethnicity: characterFormData.ethnicity || undefined,
+        character_type: characterFormData.character_type,
         wardrobe_notes: characterFormData.wardrobe_notes || undefined,
         makeup_notes: characterFormData.makeup_notes || undefined,
         special_requirements: characterFormData.special_requirements || undefined,
       })
       
+      console.log('✅ Character updated successfully:', result)
+      
+      // Close modal first
       setShowEditCharacter(false)
       setSelectedCharacter(null)
+      
+      // Reload scenes to get updated character data
+      console.log('🔄 Reloading scenes...')
       await loadScenes()
+      console.log('✅ Scenes reloaded successfully')
     } catch (err: any) {
-      console.error('Failed to update character:', err)
+      console.error('❌ Failed to update character:', err)
       setError(err.message || 'Failed to update character')
+      alert('Error updating character: ' + (err.message || 'Unknown error'))
     } finally {
       setUpdatingCharacter(false)
     }

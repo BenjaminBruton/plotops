@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 // Use service role client for server-side operations (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -53,24 +55,32 @@ export async function POST(request: NextRequest) {
 
     // Read file content
     console.log('📖 Reading file content...');
-    const text = await file.text();
-    console.log(`📄 File read successfully: ${text.length} characters`);
+    let text: string;
+    
+    // Check if it's a PDF
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      console.log('📄 PDF detected, extracting text...');
+      const pdf = await import('pdf-parse/lib/pdf-parse.js');
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const data = await pdf.default(buffer);
+      text = data.text;
+      console.log(`✅ Extracted ${text.length} characters from PDF (${data.numpages} pages)`);
+    } else {
+      text = await file.text();
+      console.log(`📄 Text file read successfully: ${text.length} characters`);
+    }
 
-    // Use Gemini 1.5 Pro - most capable model for maximum accuracy
-    // Perfect for longer scripts with 2M token context window
-    console.log('🤖 Initializing Gemini 1.5 Pro (premium model for max accuracy)...');
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro-latest",
-      generationConfig: {
-        temperature: 0.1, // Low temperature for consistent, accurate parsing
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 8192, // Allow longer outputs for large scripts
-      },
-    });
-    console.log('✅ Model initialized with premium configuration');
+    // Truncate if too large (max ~100K characters to stay under token limits)
+    const MAX_CHARS = 100000;
+    if (text.length > MAX_CHARS) {
+      console.log(`⚠️  Script is large (${text.length} chars), truncating to ${MAX_CHARS} chars`);
+      text = text.substring(0, MAX_CHARS);
+    }
 
-    console.log('📝 Creating prompt...');
+    // Use GPT-4o - excellent for structured JSON parsing with 128K context
+    console.log('🤖 Initializing GPT-4o (128K context, superior JSON output)...');
+
     const prompt = `You are an expert screenplay parser. Parse ALL scenes from the provided screenplay and extract scene information in structured JSON format.
 
 CRITICAL: You MUST parse EVERY SINGLE SCENE in the entire screenplay. Do not stop early. Parse from the first scene to the very last scene.
@@ -92,7 +102,7 @@ IMPORTANT INSTRUCTIONS:
 1. Parse EVERY scene from start to finish
 2. Keep descriptions brief (one sentence max)
 3. Return ONLY valid JSON with a "scenes" array
-4. No markdown formatting, no code blocks
+4. No markdown formatting, no explanations
 5. If you reach output limits, prioritize including ALL scenes over detailed descriptions
 
 Return format:
@@ -102,37 +112,39 @@ Screenplay to parse:
 
 ${text}`;
 
-    console.log('🚀 Sending request to Gemini API... (this may take a while for large scripts)');
-    const result = await model.generateContent(prompt);
-    console.log('✅ Gemini API responded!');
+    console.log('🚀 Sending request to OpenAI API... (this may take a while for large scripts)');
     
-    const response = result.response;
-    let resultText = response.text();
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{
+        role: 'system',
+        content: 'You are an expert screenplay parser. Return only valid JSON, no markdown formatting.'
+      }, {
+        role: 'user',
+        content: prompt
+      }],
+      temperature: 0.1, // Low temperature for consistent parsing
+      max_tokens: 16000, // Large output for full scripts
+      response_format: { type: 'json_object' } // Ensure JSON response
+    });
+
+    console.log('✅ OpenAI API responded!');
+    
+    const resultText = completion.choices[0]?.message?.content;
     console.log(`📊 Response length: ${resultText?.length || 0} characters`);
     
     if (!resultText) {
-      throw new Error('No response from Gemini');
-    }
-
-    // Strip markdown code blocks if present
-    resultText = resultText.trim();
-    if (resultText.startsWith('```json')) {
-      resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-      console.log('🔧 Stripped markdown code blocks from response');
-    } else if (resultText.startsWith('```')) {
-      resultText = resultText.replace(/^```\s*/, '').replace(/\s*```$/, '');
-      console.log('🔧 Stripped markdown code blocks from response');
+      throw new Error('No response from OpenAI');
     }
 
     console.log('📋 Parsing JSON...');
-    console.log('🔍 First 500 chars of cleaned response:', resultText.substring(0, 500));
+    console.log('🔍 First 500 chars of response:', resultText.substring(0, 500));
     const parsed = JSON.parse(resultText);
     const scenes: ParsedScene[] = parsed.scenes || [];
     console.log(`✅ Parsed ${scenes.length} scenes from response`);
     
     if (scenes.length === 0) {
-      console.warn('⚠️  No scenes were parsed! Gemini may not have understood the file format.');
-      console.warn('💡 PDF files need special parsing. The raw PDF text contains formatting codes.');
+      console.warn('⚠️  No scenes were parsed!');
     }
 
     // Delete existing scenes for this project before creating new ones
@@ -144,7 +156,6 @@ ${text}`;
 
     if (deleteError) {
       console.error('❌ Error deleting existing scenes:', deleteError);
-      // Continue anyway - might be first upload
     } else {
       console.log('✅ Existing scenes deleted');
     }
@@ -152,19 +163,16 @@ ${text}`;
     // Create scenes in database using admin client (bypasses RLS)
     console.log(`💾 Creating ${scenes.length} scenes in database...`);
     const createdScenes = [];
-    const characterMap = new Map<string, string>(); // Map character name to ID
+    const characterMap = new Map<string, string>();
     
     for (const scene of scenes) {
       try {
-        // Calculate estimated duration based on page count and dialogue presence
-        // With dialogue: 1 min/page, Without dialogue: 45 sec/page
         let estimatedDuration = 0;
         if (scene.page_count) {
           const hasDialogue = scene.characters && scene.characters.length > 0;
-          estimatedDuration = Math.round(scene.page_count * (hasDialogue ? 60 : 45) / 60); // Convert to minutes
+          estimatedDuration = Math.round(scene.page_count * (hasDialogue ? 60 : 45) / 60);
         }
 
-        // Create the scene
         const { data: sceneData, error: sceneError } = await supabaseAdmin
           .from('scenes')
           .insert([{
@@ -186,39 +194,27 @@ ${text}`;
         if (sceneError) throw sceneError;
         createdScenes.push(sceneData);
 
-        // Process characters for this scene
         if (scene.characters && scene.characters.length > 0) {
-          console.log(`👤 Processing ${scene.characters.length} characters for scene ${scene.scene_number}:`, scene.characters);
+          console.log(`👤 Processing ${scene.characters.length} characters for scene ${scene.scene_number}`);
           
           for (const characterName of scene.characters) {
             try {
               let characterId = characterMap.get(characterName);
               
-              // Create character if it doesn't exist
               if (!characterId) {
-                console.log(`🔍 Checking if character "${characterName}" exists...`);
-                const { data: existingChar, error: findError } = await supabaseAdmin
+                const { data: existingChar } = await supabaseAdmin
                   .from('characters')
                   .select('id')
                   .eq('project_id', projectId)
                   .eq('name', characterName)
                   .maybeSingle();
                 
-                if (findError) {
-                  console.error(`Error finding character ${characterName}:`, findError);
-                }
-                
                 if (existingChar) {
-                  console.log(`✅ Found existing character "${characterName}":`, existingChar.id);
                   characterId = existingChar.id;
                 } else {
-                  console.log(`➕ Creating new character "${characterName}"`);
                   const { data: newChar, error: charError } = await supabaseAdmin
                     .from('characters')
-                    .insert([{
-                      project_id: projectId,
-                      name: characterName,
-                    }])
+                    .insert([{ project_id: projectId, name: characterName }])
                     .select('id')
                     .single();
                   
@@ -226,31 +222,18 @@ ${text}`;
                     console.error(`❌ Failed to create character ${characterName}:`, charError);
                     continue;
                   }
-                  console.log(`✅ Created character "${characterName}":`, newChar.id);
                   characterId = newChar.id;
                 }
                 
-                // Only add to map if we successfully got an ID
                 if (characterId) {
                   characterMap.set(characterName, characterId);
                 }
               }
               
-              // Link character to scene (only if we have a valid character ID)
               if (characterId) {
-                console.log(`🔗 Linking character "${characterName}" to scene ${scene.scene_number}`);
-                const { error: linkError } = await supabaseAdmin
+                await supabaseAdmin
                   .from('scene_characters')
-                  .insert([{
-                    scene_id: sceneData.id,
-                    character_id: characterId,
-                  }]);
-                
-                if (linkError) {
-                  console.error(`❌ Failed to link character ${characterName} to scene:`, linkError);
-                } else {
-                  console.log(`✅ Linked character "${characterName}" to scene ${scene.scene_number}`);
-                }
+                  .insert([{ scene_id: sceneData.id, character_id: characterId }]);
               }
             } catch (charErr) {
               console.error(`❌ Error processing character ${characterName}:`, charErr);

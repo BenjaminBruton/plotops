@@ -19,7 +19,8 @@ import {
   Clock,
   User,
   LogOut,
-  ChevronUp
+  ChevronUp,
+  FileSignature
 } from "lucide-react"
 
 const navigation = [
@@ -46,6 +47,12 @@ const navigation = [
     href: '/casting',
     icon: Users,
     roles: ['casting_director', 'producer', 'admin']
+  },
+  {
+    name: 'Contracts',
+    href: '/contracts',
+    icon: FileSignature,
+    roles: ['producer', 'admin']
   },
   {
     name: 'Stripboard',

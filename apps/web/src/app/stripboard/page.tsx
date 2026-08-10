@@ -15,6 +15,30 @@ import {
   removePropFromScene
 } from '../../lib/api/scenes'
 import { exportStripboardToPDF } from '../../lib/exportStripboardPDF'
+import { generateCallSheet } from '../../lib/generateCallSheet'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  getStripboardViews,
+  createStripboardView,
+  updateStripboardView,
+  deleteStripboardView,
+  StripboardView
+} from '../../lib/api/stripboard-views'
+import { SortableSceneItem } from '../../components/stripboard/SortableSceneItem'
 
 export default function Stripboard() {
   const [projects, setProjects] = useState<any[]>([])
@@ -23,8 +47,23 @@ export default function Stripboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedScene, setSelectedScene] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState<'scene_number' | 'location' | 'scene_type' | 'time' | 'cast_count' | 'cast_appearances'>('scene_number')
+  const [sortBy, setSortBy] = useState<'scene_number' | 'location' | 'scene_type' | 'time' | 'cast_count' | 'cast_appearances' | 'custom'>('scene_number')
   const [selectedCastMember, setSelectedCastMember] = useState<string | null>(null)
+  
+  // Stripboard views state
+  const [stripboardViews, setStripboardViews] = useState<StripboardView[]>([])
+  const [currentView, setCurrentView] = useState<StripboardView | null>(null)
+  const [customSceneOrder, setCustomSceneOrder] = useState<string[]>([])
+  const [showSaveViewModal, setShowSaveViewModal] = useState(false)
+  const [saveViewName, setSaveViewName] = useState('')
+  
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
   
   // Modal states
   const [showEditModal, setShowEditModal] = useState(false)
@@ -53,8 +92,11 @@ export default function Stripboard() {
   
   const [scheduleFormData, setScheduleFormData] = useState({
     shoot_date: '',
-    status: 'scheduled' as 'scheduled' | 'in_progress' | 'completed',
+    status: 'scheduled' as 'scheduled' | 'in_progress' | 'completed' | 'not_scheduled',
   })
+  
+  // Auto-schedule confirmation
+  const [showAutoScheduleDialog, setShowAutoScheduleDialog] = useState(false)
 
   useEffect(() => {
     loadProjects()
@@ -63,8 +105,10 @@ export default function Stripboard() {
   useEffect(() => {
     if (selectedProjectId) {
       loadScenes()
+      loadStripboardViews()
     } else {
       setScenes([])
+      setStripboardViews([])
     }
   }, [selectedProjectId])
 
@@ -99,6 +143,24 @@ export default function Stripboard() {
     }
   }
 
+  async function loadStripboardViews() {
+    if (!selectedProjectId) return
+    
+    try {
+      const views = await getStripboardViews(selectedProjectId)
+      setStripboardViews(views)
+      // Load default view if exists
+      const defaultView = views.find(v => v.is_default)
+      if (defaultView) {
+        setCurrentView(defaultView)
+        setCustomSceneOrder(defaultView.scene_order)
+        setSortBy('custom')
+      }
+    } catch (err: any) {
+      console.error('Failed to load stripboard views:', err)
+    }
+  }
+
   async function loadCharactersAndProps() {
     if (!selectedProjectId) return
     
@@ -115,6 +177,58 @@ export default function Stripboard() {
     } finally {
       setLoadingCastProps(false)
     }
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    
+    const oldIndex = sortedScenes.findIndex(s => s.id === active.id)
+    const newIndex = sortedScenes.findIndex(s => s.id === over.id)
+    
+    const newOrder = arrayMove(sortedScenes, oldIndex, newIndex)
+    setCustomSceneOrder(newOrder.map(s => s.id))
+    setSortBy('custom')
+  }
+
+  async function handleSaveView() {
+    if (!selectedProjectId || !saveViewName.trim()) return
+    
+    try {
+      setUpdating(true)
+      if (currentView) {
+        // Update existing view
+        await updateStripboardView(currentView.id, {
+          name: saveViewName,
+          scene_order: customSceneOrder
+        })
+      } else {
+        // Create new view
+        await createStripboardView({
+          project_id: selectedProjectId,
+          name: saveViewName,
+          scene_order: customSceneOrder,
+          is_default: stripboardViews.length === 0 // First view is default
+        })
+      }
+      await loadStripboardViews()
+      setShowSaveViewModal(false)
+      setSaveViewName('')
+    } catch (err: any) {
+      console.error('Failed to save view:', err)
+      setError(err.message || 'Failed to save view')
+    } finally {
+      setUpdating(false)
+    }
+  }
+
+  async function handleLoadView(viewId: string) {
+    const view = stripboardViews.find(v => v.id === viewId)
+    if (!view) return
+    
+    setCurrentView(view)
+    setCustomSceneOrder(view.scene_order)
+    setSortBy('custom')
   }
 
   async function handleEditClick(scene: any, e: React.MouseEvent) {
@@ -256,8 +370,13 @@ export default function Stripboard() {
       setUpdating(true)
       setError(null)
       
+      // Ensure date is in YYYY-MM-DD format without timezone conversion
+      const shootDate = scheduleFormData.shoot_date 
+        ? scheduleFormData.shoot_date // Already in YYYY-MM-DD format from input
+        : undefined
+      
       await updateScene(schedulingScene.id, {
-        shoot_date: scheduleFormData.shoot_date || undefined,
+        shoot_date: shootDate,
         status: scheduleFormData.status,
       })
       
@@ -270,6 +389,37 @@ export default function Stripboard() {
     } finally {
       setUpdating(false)
     }
+  }
+
+  function handleAutoScheduleClick() {
+    const scheduledScenes = scenes.filter(s => s.shoot_date)
+    const allScheduled = scheduledScenes.length === scenes.length
+    
+    if (!allScheduled) {
+      setShowAutoScheduleDialog(true)
+    } else {
+      applyAutoSchedule()
+    }
+  }
+
+  function applyAutoSchedule() {
+    // Sort scenes by shoot_date, with unscheduled scenes at the end
+    const sorted = [...scenes].sort((a, b) => {
+      // If both have dates, sort by date
+      if (a.shoot_date && b.shoot_date) {
+        return new Date(a.shoot_date).getTime() - new Date(b.shoot_date).getTime()
+      }
+      // If only a has a date, it comes first
+      if (a.shoot_date) return -1
+      // If only b has a date, it comes first
+      if (b.shoot_date) return 1
+      // If neither has a date, maintain scene number order
+      return a.scene_number.localeCompare(b.scene_number)
+    })
+    
+    setCustomSceneOrder(sorted.map(s => s.id))
+    setSortBy('custom')
+    setShowAutoScheduleDialog(false)
   }
 
   const selectedProject = projects.find(p => p.id === selectedProjectId)
@@ -383,6 +533,25 @@ export default function Stripboard() {
           return a.scene_number.localeCompare(b.scene_number)
         })
       
+      case 'custom':
+        // Use custom scene order from drag and drop
+        if (customSceneOrder.length === 0) return scenesCopy
+        
+        return scenesCopy.sort((a, b) => {
+          const indexA = customSceneOrder.indexOf(a.id)
+          const indexB = customSceneOrder.indexOf(b.id)
+          
+          // If both are in the custom order, sort by their position
+          if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB
+          }
+          // If only one is in custom order, it comes first
+          if (indexA !== -1) return -1
+          if (indexB !== -1) return 1
+          // If neither is in custom order, maintain original order
+          return 0
+        })
+      
       default:
         return scenesCopy
     }
@@ -442,8 +611,14 @@ export default function Stripboard() {
               ))}
             </select>
             <button 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-10 px-4 py-2"
-              disabled={!selectedProjectId}
+              onClick={() => {
+                if (selectedProject) {
+                  generateCallSheet(scenes, selectedProject.title)
+                }
+              }}
+              disabled={!selectedProjectId || scenes.filter(s => s.shoot_date).length === 0}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-10 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={scenes.filter(s => s.shoot_date).length === 0 ? 'Schedule scenes to generate call sheets' : 'Generate actor call sheets by shoot date'}
             >
               Generate Call Sheet
             </button>
@@ -576,13 +751,18 @@ export default function Stripboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-8 px-3">
+              <button 
+                onClick={handleAutoScheduleClick}
+                disabled={scenes.length === 0}
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-8 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Auto-Schedule
               </button>
               <button 
-                onClick={() => exportStripboardToPDF(scenes, { 
+                onClick={() => exportStripboardToPDF(sortedScenes, { 
                   projectTitle: selectedProject?.title || 'Production Stripboard',
-                  includeDetails: true 
+                  includeDetails: true,
+                  sortMethod: sortBy
                 })}
                 disabled={scenes.length === 0}
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -614,127 +794,41 @@ export default function Stripboard() {
                 </div>
               </div>
               
-              <div className="space-y-4">
-                {sortedScenes.map((scene) => (
-                  <div 
-                    key={scene.id}
-                    className={`bg-gradient-to-r ${getSceneTypeColor(scene.scene_type)} rounded-lg p-4 shadow-soft hover:shadow-medium transition-all duration-200 cursor-move border-2 ${selectedScene === scene.id ? 'border-primary' : 'border-transparent'}`}
-                    onClick={() => setSelectedScene(selectedScene === scene.id ? null : scene.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        {/* Scene Number */}
-                        <div className="w-12 h-12 bg-white/80 rounded-lg flex items-center justify-center font-bold text-lg">
-                          {scene.scene_number}
-                        </div>
-                        
-                        {/* Scene Info */}
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-lg">{scene.scene_name || `Scene ${scene.scene_number}`}</h4>
-                          <div className="flex items-center gap-4 mt-1">
-                            <span className="text-sm flex items-center gap-1">
-                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              {scene.location_name || 'No location'}
-                            </span>
-                            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-gradient-to-r ${getTimeOfDayColor(scene.time_of_day)}`}>
-                              {scene.time_of_day?.toUpperCase()}
-                            </span>
-                            <span className="text-sm">{scene.page_count || 0} pages</span>
-                            <span className="text-sm">{scene.estimated_duration || 0} min</span>
-                          </div>
-                        </div>
-
-                        {/* Status */}
-                        <div className="flex flex-col items-end gap-2">
-                          <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(scene.status || 'not_scheduled')}`}>
-                            {(scene.status || 'NOT SCHEDULED').replace('_', ' ').toUpperCase()}
-                          </span>
-                          {scene.shoot_date && (
-                            <span className="text-xs text-foreground/70">
-                              {new Date(scene.shoot_date).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Expanded Details */}
-                    {selectedScene === scene.id && (
-                      <div className="mt-4 pt-4 border-t border-white/20">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <h5 className="font-medium mb-2">Cast</h5>
-                            <div className="flex flex-wrap gap-1">
-                              {scene.scene_characters && scene.scene_characters.length > 0 ? (
-                                scene.scene_characters.map((sc: any, index: number) => (
-                                  <span key={index} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-white/80 text-foreground">
-                                    {sc.character?.name || 'Unknown'}
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="text-sm text-foreground/60">No cast assigned</span>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <h5 className="font-medium mb-2">Props & Equipment</h5>
-                            <div className="flex flex-wrap gap-1">
-                              {scene.scene_props && scene.scene_props.length > 0 ? (
-                                scene.scene_props.map((sp: any, index: number) => (
-                                  <span key={index} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-white/80 text-foreground">
-                                    {sp.prop?.name || 'Unknown'} {sp.quantity > 1 ? `(${sp.quantity})` : ''}
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="text-sm text-foreground/60">No props assigned</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        {scene.description && (
-                          <div className="mt-4">
-                            <h5 className="font-medium mb-1">Description</h5>
-                            <p className="text-sm text-foreground/80">{scene.description}</p>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mt-4">
-                          <button 
-                            onClick={(e) => handleEditClick(scene, e)}
-                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-8 px-3"
-                          >
-                            Edit Scene
-                          </button>
-                          <button 
-                            onClick={(e) => handleScheduleClick(scene, e)}
-                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
-                          >
-                            Schedule
-                          </button>
-                        </div>
-                      </div>
-                    )}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={sortedScenes.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-4">
+                    {sortedScenes.map((scene) => (
+                      <SortableSceneItem
+                        key={scene.id}
+                        scene={scene}
+                        isSelected={selectedScene === scene.id}
+                        onSelect={() => setSelectedScene(selectedScene === scene.id ? null : scene.id)}
+                        onEdit={(e) => handleEditClick(scene, e)}
+                        onSchedule={(e) => handleScheduleClick(scene, e)}
+                        getSceneTypeColor={getSceneTypeColor}
+                        getTimeOfDayColor={getTimeOfDayColor}
+                        getStatusColor={getStatusColor}
+                      />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
+            </div>
 
-              {/* Drag & Drop Hint */}
-              <div className="mt-6 p-4 bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/25">
-                <p className="text-center text-sm text-muted-foreground">
-                  💡 Drag and drop scene strips to reorder your shooting schedule. 
-                  Click on scenes to view detailed information and make adjustments.
-                </p>
-              </div>
+            {/* Drag & Drop Hint */}
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg border-2 border-dashed border-muted-foreground/25">
+              <p className="text-center text-sm text-muted-foreground">
+                💡 Drag and drop scene strips to reorder your shooting schedule. 
+                Click on scenes to view detailed information and make adjustments.
+              </p>
             </div>
           </>
         )}
 
-        {/* Edit Scene Modal */}
+      {/* Edit Scene Modal */}
         {showEditModal && editingScene && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
+            <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8 max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">Edit Scene {editingScene.scene_number}</h3>
               
               <form onSubmit={handleUpdateScene}>
@@ -984,6 +1078,47 @@ export default function Stripboard() {
           </div>
         )}
 
+        {/* Auto-Schedule Confirmation Dialog */}
+        {showAutoScheduleDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold mb-4">Auto-Schedule Confirmation</h3>
+              
+              <div className="space-y-4">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    Not all scenes have been scheduled. Do you still want to organize currently scheduled scenes by their shoot dates?
+                  </p>
+                  <p className="text-xs text-yellow-700 mt-2">
+                    Scheduled scenes: <strong>{scenes.filter(s => s.shoot_date).length} of {scenes.length}</strong>
+                  </p>
+                </div>
+                
+                <p className="text-sm text-gray-600">
+                  Scenes with shoot dates will be organized chronologically. Unscheduled scenes will appear at the end in their current scene number order.
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button 
+                  type="button"
+                  onClick={() => setShowAutoScheduleDialog(false)}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button"
+                  onClick={applyAutoSchedule}
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Schedule Scene Modal */}
         {showScheduleModal && schedulingScene && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -997,7 +1132,14 @@ export default function Stripboard() {
                     <input
                       type="date"
                       value={scheduleFormData.shoot_date}
-                      onChange={(e) => setScheduleFormData({ ...scheduleFormData, shoot_date: e.target.value })}
+                      onChange={(e) => {
+                        const newData = { ...scheduleFormData, shoot_date: e.target.value }
+                        // Auto-set status to 'scheduled' when a date is selected
+                        if (e.target.value && scheduleFormData.status === 'not_scheduled') {
+                          newData.status = 'scheduled'
+                        }
+                        setScheduleFormData(newData)
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>

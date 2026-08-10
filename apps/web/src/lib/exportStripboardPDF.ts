@@ -30,10 +30,11 @@ interface Scene {
 interface ExportOptions {
   projectTitle?: string;
   includeDetails?: boolean;
+  sortMethod?: string;
 }
 
 export function exportStripboardToPDF(scenes: Scene[], options: ExportOptions = {}) {
-  const { projectTitle = 'Production Stripboard', includeDetails = true } = options;
+  const { projectTitle = 'Production Stripboard', includeDetails = true, sortMethod = 'scene_number' } = options;
 
   // Create new PDF document
   const doc = new jsPDF({
@@ -182,7 +183,21 @@ export function exportStripboardToPDF(scenes: Scene[], options: ExportOptions = 
     }
   }
 
-  // Save the PDF
-  const filename = `${projectTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_stripboard_${new Date().toISOString().split('T')[0]}.pdf`;
+  // Map sort methods to readable names
+  const sortMethodNames: Record<string, string> = {
+    scene_number: 'scene-order',
+    location: 'by-location',
+    scene_type: 'by-type',
+    time: 'by-time',
+    cast_count: 'by-cast-size',
+    cast_appearances: 'by-cast-member'
+  };
+
+  // Save the PDF with sort method in filename
+  const sortName = sortMethodNames[sortMethod] || 'scene-order';
+  const projectName = projectTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  const date = new Date().toISOString().split('T')[0];
+  const filename = `${projectName}-${sortName}-stripboard-${date}.pdf`;
+  
   doc.save(filename);
 }
