@@ -420,7 +420,7 @@ export default function LocationsPage() {
             <select 
               value={selectedProjectId || ''}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex rounded-md border border-input bg-background px-4 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Select Project</option>
               {projects.map(project => (
@@ -454,9 +454,6 @@ export default function LocationsPage() {
 
         {!selectedProjectId ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-gray-400 text-3xl">📍</span>
-            </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No project selected</h3>
             <p className="text-gray-500">Select a project from the dropdown above to manage locations</p>
           </div>
@@ -505,12 +502,12 @@ export default function LocationsPage() {
                     placeholder="Search locations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex rounded-md border border-input bg-background px-4 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as LocationStatus | 'all')}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex rounded-md border border-input bg-background px-4 py-2 text-sm"
                   >
                     <option value="all">All Statuses</option>
                     <option value="scouting">Scouting</option>
@@ -524,13 +521,13 @@ export default function LocationsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`px-3 py-2 rounded-md text-sm ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                    className={`px-4 py-2 rounded-md text-sm ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
                   >
                     Grid
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-3 py-2 rounded-md text-sm ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+                    className={`px-4 py-2 rounded-md text-sm ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
                   >
                     List
                   </button>
@@ -562,13 +559,13 @@ export default function LocationsPage() {
                   <div key={location.id} className="rounded-lg border bg-card shadow-soft overflow-hidden hover:shadow-medium transition-shadow">
                     {/* Photo placeholder */}
                     <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                      <span className="text-6xl">📸</span>
+                      <div className="text-sm text-muted-foreground">No image</div>
                     </div>
                     
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-lg">{location.name}</h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${statusColors[location.status]}`}>
+                        <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${statusColors[location.status]}`}>
                           {location.status.replace('_', ' ').toUpperCase()}
                         </span>
                       </div>
@@ -581,7 +578,7 @@ export default function LocationsPage() {
                       
                       {location.city && location.state && (
                         <div className="text-sm text-muted-foreground mb-3">
-                          📍 {location.city}, {location.state}
+                          {location.city}, {location.state}
                         </div>
                       )}
                       
@@ -596,9 +593,9 @@ export default function LocationsPage() {
                       )}
                       
                       <div className="flex items-center gap-2 text-xs mb-3">
-                        {location.power_available && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">⚡ Power</span>}
-                        {location.parking_info && <span className="px-2 py-1 bg-green-100 text-green-700 rounded">🅿️ Parking</span>}
-                        {location.wifi_available && <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">📶 WiFi</span>}
+                        {location.power_available && <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded">Power</span>}
+                        {location.parking_info && <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded">Parking</span>}
+                        {location.wifi_available && <span className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded">WiFi</span>}
                       </div>
                       
                       <div className="flex gap-2">
@@ -607,13 +604,13 @@ export default function LocationsPage() {
                             setSelectedLocation(location)
                             setShowViewModal(true)
                           }}
-                          className="flex-1 px-3 py-2 text-sm border border-input bg-background hover:bg-accent rounded-md"
+                          className="flex-1 px-4 py-2 text-sm border border-input bg-background hover:bg-accent rounded-md"
                         >
                           View
                         </button>
                         <button
                           onClick={() => handleEditClick(location)}
-                          className="flex-1 px-3 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
+                          className="flex-1 px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                         >
                           Edit
                         </button>
@@ -657,7 +654,7 @@ export default function LocationsPage() {
                           ) : 'Not rated'}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${statusColors[location.status]}`}>
+                          <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${statusColors[location.status]}`}>
                             {location.status.replace('_', ' ')}
                           </span>
                         </td>
@@ -716,7 +713,7 @@ export default function LocationsPage() {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="e.g., Downtown Warehouse"
                       />
                     </div>
@@ -725,7 +722,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.location_type}
                         onChange={(e) => setFormData({...formData, location_type: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="">Select type</option>
                         <option value="studio">Studio</option>
@@ -742,7 +739,7 @@ export default function LocationsPage() {
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="Brief description of the location..."
                       />
                     </div>
@@ -751,7 +748,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.status}
                         onChange={(e) => setFormData({...formData, status: e.target.value as LocationStatus})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="scouting">Scouting</option>
                         <option value="pending_approval">Pending Approval</option>
@@ -774,7 +771,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.address_line1}
                         onChange={(e) => setFormData({...formData, address_line1: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="Street address"
                       />
                     </div>
@@ -784,7 +781,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.address_line2}
                         onChange={(e) => setFormData({...formData, address_line2: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="Apt, suite, unit, etc. (optional)"
                       />
                     </div>
@@ -794,7 +791,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.city}
                         onChange={(e) => setFormData({...formData, city: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -803,7 +800,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.state}
                         onChange={(e) => setFormData({...formData, state: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -812,7 +809,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.zip_code}
                         onChange={(e) => setFormData({...formData, zip_code: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -821,7 +818,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.country}
                         onChange={(e) => setFormData({...formData, country: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -837,7 +834,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.contact_name}
                         onChange={(e) => setFormData({...formData, contact_name: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -846,7 +843,7 @@ export default function LocationsPage() {
                         type="tel"
                         value={formData.contact_phone}
                         onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -855,7 +852,7 @@ export default function LocationsPage() {
                         type="email"
                         value={formData.contact_email}
                         onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -872,7 +869,7 @@ export default function LocationsPage() {
                         step="0.01"
                         value={formData.cost_per_day}
                         onChange={(e) => setFormData({...formData, cost_per_day: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -880,7 +877,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.cell_service_quality}
                         onChange={(e) => setFormData({...formData, cell_service_quality: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="">Select quality</option>
                         <option value="excellent">Excellent</option>
@@ -896,7 +893,7 @@ export default function LocationsPage() {
                         value={formData.parking_info}
                         onChange={(e) => setFormData({...formData, parking_info: e.target.value})}
                         rows={2}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="Parking availability, spots, restrictions..."
                       />
                     </div>
@@ -910,7 +907,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, power_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">⚡ Power Available</span>
+                      <span className="text-sm">Power Available</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input
@@ -919,7 +916,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, restroom_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">🚻 Restrooms</span>
+                      <span className="text-sm">Restrooms</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input
@@ -937,7 +934,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, wifi_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">📶 WiFi</span>
+                      <span className="text-sm">WiFi</span>
                     </label>
                   </div>
                 </div>
@@ -971,7 +968,7 @@ export default function LocationsPage() {
                       value={formData.permit_notes}
                       onChange={(e) => setFormData({...formData, permit_notes: e.target.value})}
                       rows={2}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                     />
                   </div>
                   <div>
@@ -980,7 +977,7 @@ export default function LocationsPage() {
                       type="text"
                       value={formData.time_restrictions}
                       onChange={(e) => setFormData({...formData, time_restrictions: e.target.value})}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       placeholder="e.g., No shooting after 8pm"
                     />
                   </div>
@@ -996,7 +993,7 @@ export default function LocationsPage() {
                       multiple
                       accept="image/*"
                       onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                     />
                     {selectedFiles.length > 0 && (
                       <div className="mt-2 text-xs text-muted-foreground">
@@ -1048,7 +1045,7 @@ export default function LocationsPage() {
                         value={formData.pros}
                         onChange={(e) => setFormData({...formData, pros: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="What's great about this location..."
                       />
                     </div>
@@ -1058,7 +1055,7 @@ export default function LocationsPage() {
                         value={formData.cons}
                         onChange={(e) => setFormData({...formData, cons: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                         placeholder="Potential issues or concerns..."
                       />
                     </div>
@@ -1069,7 +1066,7 @@ export default function LocationsPage() {
                       value={formData.scout_notes}
                       onChange={(e) => setFormData({...formData, scout_notes: e.target.value})}
                       rows={3}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       placeholder="General observations and notes..."
                     />
                   </div>
@@ -1125,7 +1122,7 @@ export default function LocationsPage() {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1133,7 +1130,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.location_type}
                         onChange={(e) => setFormData({...formData, location_type: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="">Select type</option>
                         <option value="studio">Studio</option>
@@ -1150,7 +1147,7 @@ export default function LocationsPage() {
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1158,7 +1155,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.status}
                         onChange={(e) => setFormData({...formData, status: e.target.value as LocationStatus})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="scouting">Scouting</option>
                         <option value="pending_approval">Pending Approval</option>
@@ -1181,7 +1178,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.address_line1}
                         onChange={(e) => setFormData({...formData, address_line1: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -1190,7 +1187,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.address_line2}
                         onChange={(e) => setFormData({...formData, address_line2: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1199,7 +1196,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.city}
                         onChange={(e) => setFormData({...formData, city: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1208,7 +1205,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.state}
                         onChange={(e) => setFormData({...formData, state: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1217,7 +1214,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.zip_code}
                         onChange={(e) => setFormData({...formData, zip_code: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1226,7 +1223,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.country}
                         onChange={(e) => setFormData({...formData, country: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -1242,7 +1239,7 @@ export default function LocationsPage() {
                         type="text"
                         value={formData.contact_name}
                         onChange={(e) => setFormData({...formData, contact_name: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1251,7 +1248,7 @@ export default function LocationsPage() {
                         type="tel"
                         value={formData.contact_phone}
                         onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1260,7 +1257,7 @@ export default function LocationsPage() {
                         type="email"
                         value={formData.contact_email}
                         onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -1277,7 +1274,7 @@ export default function LocationsPage() {
                         step="0.01"
                         value={formData.cost_per_day}
                         onChange={(e) => setFormData({...formData, cost_per_day: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1285,7 +1282,7 @@ export default function LocationsPage() {
                       <select
                         value={formData.cell_service_quality}
                         onChange={(e) => setFormData({...formData, cell_service_quality: e.target.value})}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       >
                         <option value="">Select quality</option>
                         <option value="excellent">Excellent</option>
@@ -1301,7 +1298,7 @@ export default function LocationsPage() {
                         value={formData.parking_info}
                         onChange={(e) => setFormData({...formData, parking_info: e.target.value})}
                         rows={2}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -1313,7 +1310,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, power_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">⚡ Power Available</span>
+                      <span className="text-sm">Power Available</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input
@@ -1322,7 +1319,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, restroom_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">🚻 Restrooms</span>
+                      <span className="text-sm">Restrooms</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input
@@ -1340,7 +1337,7 @@ export default function LocationsPage() {
                         onChange={(e) => setFormData({...formData, wifi_available: e.target.checked})}
                         className="rounded border-input"
                       />
-                      <span className="text-sm">📶 WiFi</span>
+                      <span className="text-sm">WiFi</span>
                     </label>
                   </div>
                 </div>
@@ -1374,7 +1371,7 @@ export default function LocationsPage() {
                       value={formData.permit_notes}
                       onChange={(e) => setFormData({...formData, permit_notes: e.target.value})}
                       rows={2}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                     />
                   </div>
                   <div>
@@ -1383,7 +1380,7 @@ export default function LocationsPage() {
                       type="text"
                       value={formData.time_restrictions}
                       onChange={(e) => setFormData({...formData, time_restrictions: e.target.value})}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                     />
                   </div>
                 </div>
@@ -1398,7 +1395,7 @@ export default function LocationsPage() {
                       multiple
                       accept="image/*"
                       onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                     />
                     {selectedFiles.length > 0 && (
                       <div className="mt-2 text-xs text-muted-foreground">
@@ -1450,7 +1447,7 @@ export default function LocationsPage() {
                         value={formData.pros}
                         onChange={(e) => setFormData({...formData, pros: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                     <div>
@@ -1459,7 +1456,7 @@ export default function LocationsPage() {
                         value={formData.cons}
                         onChange={(e) => setFormData({...formData, cons: e.target.value})}
                         rows={3}
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                       />
                     </div>
                   </div>
@@ -1469,7 +1466,7 @@ export default function LocationsPage() {
                       value={formData.scout_notes}
                       onChange={(e) => setFormData({...formData, scout_notes: e.target.value})}
                       rows={3}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      className="w-full px-4 py-2 border rounded-md bg-background text-sm"
                     />
                   </div>
                 </div>
@@ -1548,10 +1545,10 @@ export default function LocationsPage() {
                 )}
 
                 <div className="flex gap-2 flex-wrap">
-                  {selectedLocation.power_available && <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">⚡ Power</span>}
-                  {selectedLocation.parking_info && <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">🅿️ Parking</span>}
-                  {selectedLocation.wifi_available && <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">📶 WiFi</span>}
-                  {selectedLocation.restroom_available && <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">🚻 Restrooms</span>}
+                  {selectedLocation.power_available && <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">Power</span>}
+                  {selectedLocation.parking_info && <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Parking</span>}
+                  {selectedLocation.wifi_available && <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">WiFi</span>}
+                  {selectedLocation.restroom_available && <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">Restrooms</span>}
                   {selectedLocation.catering_space && <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">🍽️ Catering</span>}
                 </div>
 

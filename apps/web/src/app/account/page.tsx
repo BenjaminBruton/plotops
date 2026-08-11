@@ -12,10 +12,16 @@ export default function AccountPage() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [organization, setOrganization] = useState('')
+  const [organizationId, setOrganizationId] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState('crew')
+  const [invitations, setInvitations] = useState<any[]>([])
+  const [teamMembers, setTeamMembers] = useState<any[]>([])
 
   useEffect(() => {
     getProfile()
+    loadTeamData()
   }, [])
 
   async function getProfile() {
@@ -36,6 +42,7 @@ export default function AccountPage() {
         if (profile) {
           setFirstName(profile.first_name || '')
           setLastName(profile.last_name || '')
+          setOrganizationId(profile.organization_id || '')
           if (profile.organizations) {
             setOrganization((profile.organizations as any).name || '')
           }
@@ -47,6 +54,88 @@ export default function AccountPage() {
       console.error('Error loading user data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadTeamData() {
+    if (!user?.id) return
+    
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile?.organization_id) return
+
+      // Load team members
+      const { data: members } = await supabase
+        .from('user_profiles')
+        .select('id, first_name, last_name, role, created_at')
+        .eq('organization_id', profile.organization_id)
+        .order('created_at')
+
+      setTeamMembers(members || [])
+
+      // Load invitations
+      const { data: invites } = await supabase
+        .from('organization_invitations')
+        .select('*')
+        .eq('organization_id', profile.organization_id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+
+      setInvitations(invites || [])
+    } catch (error) {
+      console.error('Error loading team data:', error)
+    }
+  }
+
+  async function sendInvite(e: React.FormEvent) {
+    e.preventDefault()
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Not authenticated')
+
+      const response = await fetch('/api/invitations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ email: inviteEmail, role: inviteRole })
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error)
+
+      setMessage({ type: 'success', text: `Invitation sent to ${inviteEmail}!` })
+      setInviteEmail('')
+      loadTeamData()
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message })
+    }
+  }
+
+  async function cancelInvite(inviteId: string) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+
+      const response = await fetch(`/api/invitations?id=${inviteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      })
+
+      if (!response.ok) throw new Error('Failed to cancel invitation')
+
+      setMessage({ type: 'success', text: 'Invitation cancelled' })
+      loadTeamData()
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message })
     }
   }
 
@@ -201,6 +290,96 @@ export default function AccountPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        {/* Team Management Section */}
+        <div className="bg-white shadow rounded-lg mt-6">
+          <div className="px-4 py-5 sm:p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Team Management</h2>
+
+            {/* Invite New Member */}
+            <form onSubmit={sendInvite} className="mb-8 p-4 bg-gray-50 rounded-lg border">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">Invite Team Member</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="colleague@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <select
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="producer">Producer</option>
+                    <option value="director">Director</option>
+                    <option value="crew">Crew</option>
+                  </select>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 whitespace-nowrap"
+                  >
+                    Send Invite
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            {/* Pending Invitations */}
+            {invitations.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Pending Invitations ({invitations.length})</h3>
+                <div className="space-y-2">
+                  {invitations.map((invite) => (
+                    <div key={invite.id} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{invite.email}</p>
+                        <p className="text-sm text-gray-500 capitalize">
+                          {invite.role} • Invited {new Date(invite.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => cancelInvite(invite.id)}
+                        className="text-sm text-red-600 hover:text-red-800"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Team Members */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Team Members ({teamMembers.length})</h3>
+              <div className="space-y-2">
+                {teamMembers.map((member) => (
+                  <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 border rounded-md">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">
+                        {member.first_name} {member.last_name}
+                        {member.id === user?.id && <span className="ml-2 text-xs text-blue-600">(You)</span>}
+                      </p>
+                      <p className="text-sm text-gray-500 capitalize">{member.role}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+              <p className="text-sm text-blue-800">
+                💡 <strong>Tip:</strong> Share the invitation link with your team members or they will receive an email (if configured).
+              </p>
+            </div>
           </div>
         </div>
       </div>

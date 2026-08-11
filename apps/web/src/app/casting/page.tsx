@@ -283,9 +283,18 @@ export default function Casting() {
     <AppLayout>
       <div className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Casting Management</h2>
-            <p className="text-muted-foreground">Assign actors to character roles</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Casting Management</h2>
+              <p className="text-muted-foreground">Assign actors to character roles</p>
+            </div>
+            <button 
+              onClick={() => setShowPublishModal(true)}
+              disabled={!selectedProjectId || characters.length === 0}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-medium h-10 px-4 py-2"
+            >
+              Publish Casting Call
+            </button>
           </div>
           <div className="flex items-center gap-3">
             {/* Project Selector */}
@@ -293,7 +302,7 @@ export default function Casting() {
               <select
                 value={selectedProjectId || ''}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
-                className="px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
@@ -302,13 +311,6 @@ export default function Casting() {
                 ))}
               </select>
             )}
-            <button 
-              onClick={() => setShowPublishModal(true)}
-              disabled={!selectedProjectId || characters.length === 0}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-soft hover:shadow-medium h-10 px-4 py-2"
-            >
-              📢 Publish Casting Call
-            </button>
             <button 
               onClick={() => setShowActorModal(true)}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium h-10 px-4 py-2"
@@ -345,7 +347,7 @@ export default function Casting() {
               </div>
               <button
                 onClick={() => setCharactersCollapsed(!charactersCollapsed)}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {charactersCollapsed ? (
                   <>
@@ -471,7 +473,7 @@ export default function Casting() {
                     <div className={`rounded-lg border p-3 mb-4 ${stage.color}`}>
                       <div className="flex items-center justify-between">
                         <h4 className="font-semibold text-sm">{stage.title}</h4>
-                        <span className="text-xs bg-white px-2 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-white px-3 py-1.5 rounded-full font-medium">
                           {auditionsByStage[stage.id as AuditionStage]?.length || 0}
                         </span>
                       </div>
@@ -512,7 +514,7 @@ export default function Casting() {
                                 <button
                                   onClick={() => canMoveLeft && handleMoveAudition(audition.id, auditionStages[currentStageIndex - 1].id as AuditionStage)}
                                   disabled={!canMoveLeft}
-                                  className="flex-1 text-xs px-2 py-1 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
+                                  className="flex-1 text-xs px-3 py-1.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
                                   title={canMoveLeft ? `Move to ${auditionStages[currentStageIndex - 1].title}` : 'Cannot move left'}
                                 >
                                   ←
@@ -522,7 +524,7 @@ export default function Casting() {
                                     setSelectedAudition(audition)
                                     setShowEditAuditionModal(true)
                                   }}
-                                  className="flex-1 text-xs px-2 py-1 rounded hover:bg-accent font-medium"
+                                  className="flex-1 text-xs px-3 py-1.5 rounded hover:bg-accent font-medium"
                                   title="Edit audition"
                                 >
                                   Edit
@@ -530,7 +532,7 @@ export default function Casting() {
                                 <button
                                   onClick={() => canMoveRight && handleMoveAudition(audition.id, auditionStages[currentStageIndex + 1].id as AuditionStage)}
                                   disabled={!canMoveRight}
-                                  className="flex-1 text-xs px-2 py-1 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
+                                  className="flex-1 text-xs px-3 py-1.5 rounded hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed"
                                   title={canMoveRight ? `Move to ${auditionStages[currentStageIndex + 1].title}` : 'Cannot move right'}
                                 >
                                   →
@@ -568,7 +570,7 @@ export default function Casting() {
                       type="text"
                       value={newActor.first_name}
                       onChange={(e) => setNewActor({ ...newActor, first_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       required
                     />
                   </div>
@@ -578,7 +580,7 @@ export default function Casting() {
                       type="text"
                       value={newActor.last_name}
                       onChange={(e) => setNewActor({ ...newActor, last_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                       required
                     />
                   </div>
@@ -589,7 +591,7 @@ export default function Casting() {
                     type="email"
                     value={newActor.email || ''}
                     onChange={(e) => setNewActor({ ...newActor, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -598,7 +600,7 @@ export default function Casting() {
                     type="tel"
                     value={newActor.phone || ''}
                     onChange={(e) => setNewActor({ ...newActor, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
                 <div>
@@ -607,7 +609,7 @@ export default function Casting() {
                     type="text"
                     value={newActor.age_range || ''}
                     onChange={(e) => setNewActor({ ...newActor, age_range: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="e.g., 25-35"
                   />
                 </div>
@@ -711,7 +713,7 @@ export default function Casting() {
                   <select
                     value={selectedAudition.stage}
                     onChange={(e) => setSelectedAudition({ ...selectedAudition, stage: e.target.value as AuditionStage })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="submitted">Submitted</option>
                     <option value="reviewing">Under Review</option>
@@ -725,7 +727,7 @@ export default function Casting() {
                   <textarea
                     value={selectedAudition.notes || ''}
                     onChange={(e) => setSelectedAudition({ ...selectedAudition, notes: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     rows={4}
                     placeholder="Add notes about this audition..."
                   />
@@ -773,7 +775,7 @@ export default function Casting() {
                   <select
                     value={applicantForm.actorId}
                     onChange={(e) => setApplicantForm({ ...applicantForm, actorId: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="">Choose an actor...</option>
                     {actors.map((actor) => (
@@ -788,7 +790,7 @@ export default function Casting() {
                   <select
                     value={applicantForm.characterId}
                     onChange={(e) => setApplicantForm({ ...applicantForm, characterId: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="">Choose a character...</option>
                     {characters.map((char) => (
@@ -801,7 +803,7 @@ export default function Casting() {
                   <select
                     value={applicantForm.stage}
                     onChange={(e) => setApplicantForm({ ...applicantForm, stage: e.target.value as AuditionStage })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="submitted">Submitted</option>
                     <option value="reviewing">Under Review</option>
@@ -815,7 +817,7 @@ export default function Casting() {
                   <textarea
                     value={applicantForm.notes}
                     onChange={(e) => setApplicantForm({ ...applicantForm, notes: e.target.value })}
-                    className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     rows={3}
                     placeholder="Add any notes about this audition..."
                   />
@@ -1066,7 +1068,7 @@ function PublishCastingCallModal({
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[120px]"
+              className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[120px]"
               placeholder="Describe your project, shooting schedule, and what you're looking for..."
             />
           </div>
@@ -1084,7 +1086,7 @@ function PublishCastingCallModal({
                   type="text"
                   value={formData.contactName}
                   onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder="John Doe"
                   required
                 />
@@ -1095,7 +1097,7 @@ function PublishCastingCallModal({
                   type="email"
                   value={formData.contactEmail}
                   onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder="casting@production.com"
                   required
                 />
@@ -1106,7 +1108,7 @@ function PublishCastingCallModal({
                   type="tel"
                   value={formData.contactPhone}
                   onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
-                  className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder="(555) 123-4567"
                 />
               </div>
@@ -1178,7 +1180,7 @@ function PublishCastingCallModal({
                         min="1"
                         value={position.count}
                         onChange={(e) => updateCrewCount(role, parseInt(e.target.value) || 1)}
-                        className="w-16 px-2 py-1 border border-input rounded text-xs"
+                        className="w-16 px-3 py-1.5 border border-input rounded text-xs"
                         onClick={(e) => e.stopPropagation()}
                       />
                     )}

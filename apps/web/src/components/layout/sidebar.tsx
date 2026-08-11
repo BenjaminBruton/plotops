@@ -20,7 +20,9 @@ import {
   User,
   LogOut,
   ChevronUp,
-  FileSignature
+  FileSignature,
+  UserCog,
+  Package
 } from "lucide-react"
 
 const navigation = [
@@ -49,6 +51,12 @@ const navigation = [
     roles: ['casting_director', 'producer', 'admin']
   },
   {
+    name: 'Crew',
+    href: '/crew',
+    icon: UserCog,
+    roles: ['producer', 'assistant_director', 'admin']
+  },
+  {
     name: 'Contracts',
     href: '/contracts',
     icon: FileSignature,
@@ -65,6 +73,12 @@ const navigation = [
     href: '/locations',
     icon: MapPin,
     roles: ['location_scout', 'assistant_director', 'producer', 'admin']
+  },
+  {
+    name: 'Props & Costume',
+    href: '/props',
+    icon: Package,
+    roles: ['producer', 'assistant_director', 'admin']
   },
   {
     name: 'Call Sheets',

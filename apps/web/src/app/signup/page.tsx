@@ -42,9 +42,9 @@ export default function SignupPage() {
       console.log('✅ Signup successful:', data.user?.email)
       setSuccess(true)
       
-      // Auto-login after successful signup
+      // Redirect to onboarding flow
       setTimeout(() => {
-        router.push('/script-breakdown')
+        router.push('/onboarding')
         router.refresh()
       }, 2000)
     } catch (err: any) {

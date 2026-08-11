@@ -321,7 +321,7 @@ export default function ContractsPage() {
             <select 
               value={selectedProjectId || ''}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex rounded-md border border-input bg-background px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Select Project</option>
               {projects.map(project => (
@@ -348,9 +348,6 @@ export default function ContractsPage() {
 
         {!selectedProjectId ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-gray-400 text-3xl">📄</span>
-            </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No project selected</h3>
             <p className="text-gray-500">Select a project from the dropdown above to manage contracts</p>
           </div>
@@ -399,12 +396,12 @@ export default function ContractsPage() {
                     placeholder="Search contracts..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex rounded-md border border-input bg-background px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                   <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value as ContractType | 'all')}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex rounded-md border border-input bg-background px-4 py-2 text-sm"
                   >
                     <option value="all">All Types</option>
                     <option value="actor">Actor</option>
@@ -416,7 +413,7 @@ export default function ContractsPage() {
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as ContractStatus | 'all')}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex rounded-md border border-input bg-background px-4 py-2 text-sm"
                   >
                     <option value="all">All Statuses</option>
                     <option value="draft">Draft</option>
@@ -435,9 +432,6 @@ export default function ContractsPage() {
             {/* Contracts Table */}
             {filteredContracts.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-gray-400 text-3xl">📝</span>
-                </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No contracts yet</h3>
                 <p className="text-gray-500 mb-4">Create your first contract to get started</p>
                 <button 
@@ -555,7 +549,7 @@ export default function ContractsPage() {
                       required
                       value={formData.contract_type}
                       onChange={(e) => setFormData({ ...formData, contract_type: e.target.value as ContractType })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="actor">Actor</option>
                       <option value="crew">Crew</option>
@@ -573,7 +567,7 @@ export default function ContractsPage() {
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., Actor Agreement - John Doe"
                     />
                   </div>
@@ -585,7 +579,7 @@ export default function ContractsPage() {
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Brief description of the contract"
                     />
                   </div>
@@ -598,7 +592,7 @@ export default function ContractsPage() {
                         <select
                           value={formData.actor_id}
                           onChange={(e) => setFormData({ ...formData, actor_id: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Actor</option>
                           {actors.map(actor => (
@@ -613,7 +607,7 @@ export default function ContractsPage() {
                         <select
                           value={formData.character_id}
                           onChange={(e) => setFormData({ ...formData, character_id: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Character</option>
                           {characters.map(char => (
@@ -632,7 +626,7 @@ export default function ContractsPage() {
                         type="text"
                         value={formData.vendor_name}
                         onChange={(e) => setFormData({ ...formData, vendor_name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Company or vendor name"
                       />
                     </div>
@@ -646,7 +640,7 @@ export default function ContractsPage() {
                       required
                       value={formData.contracting_party_name}
                       onChange={(e) => setFormData({ ...formData, contracting_party_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Person or company signing"
                     />
                   </div>
@@ -657,7 +651,7 @@ export default function ContractsPage() {
                       type="email"
                       value={formData.contracting_party_email}
                       onChange={(e) => setFormData({ ...formData, contracting_party_email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -667,7 +661,7 @@ export default function ContractsPage() {
                       type="tel"
                       value={formData.contracting_party_phone}
                       onChange={(e) => setFormData({ ...formData, contracting_party_phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -677,7 +671,7 @@ export default function ContractsPage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as ContractStatus })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="draft">Draft</option>
                       <option value="pending_signature">Pending Signature</option>
@@ -694,7 +688,7 @@ export default function ContractsPage() {
                       type="date"
                       value={formData.start_date}
                       onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -704,7 +698,7 @@ export default function ContractsPage() {
                       type="date"
                       value={formData.end_date}
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -716,7 +710,7 @@ export default function ContractsPage() {
                       step="0.01"
                       value={formData.contract_amount}
                       onChange={(e) => setFormData({ ...formData, contract_amount: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="0.00"
                     />
                   </div>
@@ -726,7 +720,7 @@ export default function ContractsPage() {
                     <select
                       value={formData.currency}
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
@@ -741,7 +735,7 @@ export default function ContractsPage() {
                       value={formData.payment_schedule}
                       onChange={(e) => setFormData({ ...formData, payment_schedule: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="e.g., 50% upfront, 50% on completion"
                     />
                   </div>
@@ -752,7 +746,7 @@ export default function ContractsPage() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Internal notes about this contract"
                     />
                   </div>
@@ -763,7 +757,7 @@ export default function ContractsPage() {
                       value={formData.terms_and_conditions}
                       onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Contract terms and conditions"
                     />
                   </div>
@@ -806,7 +800,7 @@ export default function ContractsPage() {
                       required
                       value={formData.contract_type}
                       onChange={(e) => setFormData({ ...formData, contract_type: e.target.value as ContractType })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="actor">Actor</option>
                       <option value="crew">Crew</option>
@@ -823,7 +817,7 @@ export default function ContractsPage() {
                       required
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -833,7 +827,7 @@ export default function ContractsPage() {
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -844,7 +838,7 @@ export default function ContractsPage() {
                         <select
                           value={formData.actor_id}
                           onChange={(e) => setFormData({ ...formData, actor_id: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Actor</option>
                           {actors.map(actor => (
@@ -859,7 +853,7 @@ export default function ContractsPage() {
                         <select
                           value={formData.character_id}
                           onChange={(e) => setFormData({ ...formData, character_id: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Select Character</option>
                           {characters.map(char => (
@@ -877,7 +871,7 @@ export default function ContractsPage() {
                         type="text"
                         value={formData.vendor_name}
                         onChange={(e) => setFormData({ ...formData, vendor_name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   )}
@@ -889,7 +883,7 @@ export default function ContractsPage() {
                       required
                       value={formData.contracting_party_name}
                       onChange={(e) => setFormData({ ...formData, contracting_party_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -899,7 +893,7 @@ export default function ContractsPage() {
                       type="email"
                       value={formData.contracting_party_email}
                       onChange={(e) => setFormData({ ...formData, contracting_party_email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -909,7 +903,7 @@ export default function ContractsPage() {
                       type="tel"
                       value={formData.contracting_party_phone}
                       onChange={(e) => setFormData({ ...formData, contracting_party_phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -918,7 +912,7 @@ export default function ContractsPage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value as ContractStatus })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="draft">Draft</option>
                       <option value="pending_signature">Pending Signature</option>
@@ -936,7 +930,7 @@ export default function ContractsPage() {
                       type="date"
                       value={formData.start_date}
                       onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -946,7 +940,7 @@ export default function ContractsPage() {
                       type="date"
                       value={formData.end_date}
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -957,7 +951,7 @@ export default function ContractsPage() {
                       step="0.01"
                       value={formData.contract_amount}
                       onChange={(e) => setFormData({ ...formData, contract_amount: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -966,7 +960,7 @@ export default function ContractsPage() {
                     <select
                       value={formData.currency}
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
@@ -981,7 +975,7 @@ export default function ContractsPage() {
                       value={formData.payment_schedule}
                       onChange={(e) => setFormData({ ...formData, payment_schedule: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -991,7 +985,7 @@ export default function ContractsPage() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1001,7 +995,7 @@ export default function ContractsPage() {
                       value={formData.terms_and_conditions}
                       onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>

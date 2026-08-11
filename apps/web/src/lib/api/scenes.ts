@@ -69,8 +69,10 @@ export async function getScenes(projectId: string) {
       ),
       scene_props(
         id,
-        quantity,
-        prop:props(id, name, category)
+        quantity_for_scene,
+        critical,
+        scene_notes,
+        prop:props(id, name, category, status)
       )
     `
     )
@@ -104,8 +106,9 @@ export async function getScene(sceneId: string) {
       ),
       scene_props(
         id,
-        quantity,
-        notes,
+        quantity_for_scene,
+        critical,
+        scene_notes,
         prop:props(*)
       )
     `

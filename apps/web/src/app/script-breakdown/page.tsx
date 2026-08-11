@@ -450,7 +450,7 @@ export default function ScriptBreakdown() {
             <select 
               value={selectedProjectId || ''}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex rounded-md border bg-background px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Select Project</option>
               {projects.map(project => (
@@ -916,7 +916,7 @@ export default function ScriptBreakdown() {
                       required
                       value={sceneFormData.scene_number}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_number: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="1"
                     />
                   </div>
@@ -927,7 +927,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={sceneFormData.scene_name}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Opening Scene"
                     />
                   </div>
@@ -938,7 +938,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={sceneFormData.location_name}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, location_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="BANK LOBBY"
                     />
                   </div>
@@ -948,7 +948,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.scene_type}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_type: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="int">Interior</option>
                       <option value="ext">Exterior</option>
@@ -961,7 +961,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.time_of_day}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, time_of_day: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="day">Day</option>
                       <option value="night">Night</option>
@@ -978,7 +978,7 @@ export default function ScriptBreakdown() {
                       step="0.125"
                       value={sceneFormData.page_count}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, page_count: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="2.5"
                     />
                   </div>
@@ -989,7 +989,7 @@ export default function ScriptBreakdown() {
                       type="number"
                       value={sceneFormData.estimated_duration}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, estimated_duration: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="8"
                     />
                   </div>
@@ -999,7 +999,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.complexity_rating}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, complexity_rating: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value={1}>1 - Very Simple</option>
                       <option value={2}>2 - Simple</option>
@@ -1014,7 +1014,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={sceneFormData.description}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder="Describe what happens in this scene..."
                     />
@@ -1025,7 +1025,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={sceneFormData.script_notes}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, script_notes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                       placeholder="Production notes, special requirements, etc."
                     />
@@ -1252,7 +1252,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       disabled
                       value={characterFormData.name}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
+                      className="w-full px-4 py-2 border rounded-md bg-gray-100 text-gray-600"
                     />
                     <p className="text-xs text-gray-500 mt-1">Character name cannot be edited</p>
                   </div>
@@ -1262,7 +1262,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={characterFormData.character_type}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, character_type: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="lead">Lead</option>
                       <option value="supporting">Supporting</option>
@@ -1278,7 +1278,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={characterFormData.age_range}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, age_range: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="20-30"
                     />
                   </div>
@@ -1289,7 +1289,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={characterFormData.gender}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, gender: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="M/F/NB"
                     />
                   </div>
@@ -1300,7 +1300,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={characterFormData.ethnicity}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, ethnicity: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Any"
                     />
                   </div>
@@ -1310,7 +1310,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={characterFormData.description}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder="Character description..."
                     />
@@ -1321,7 +1321,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={characterFormData.wardrobe_notes}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, wardrobe_notes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                       placeholder="Wardrobe requirements and notes..."
                     />
@@ -1332,7 +1332,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={characterFormData.makeup_notes}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, makeup_notes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                       placeholder="Makeup requirements and notes..."
                     />
@@ -1343,7 +1343,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={characterFormData.special_requirements}
                       onChange={(e) => setCharacterFormData({ ...characterFormData, special_requirements: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                       placeholder="Special requirements..."
                     />
@@ -1390,7 +1390,7 @@ export default function ScriptBreakdown() {
                       required
                       value={sceneFormData.scene_number}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_number: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1400,7 +1400,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={sceneFormData.scene_name}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1410,7 +1410,7 @@ export default function ScriptBreakdown() {
                       type="text"
                       value={sceneFormData.location_name}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, location_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1419,7 +1419,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.scene_type}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, scene_type: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="int">Interior</option>
                       <option value="ext">Exterior</option>
@@ -1432,7 +1432,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.time_of_day}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, time_of_day: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="day">Day</option>
                       <option value="night">Night</option>
@@ -1449,7 +1449,7 @@ export default function ScriptBreakdown() {
                       step="0.125"
                       value={sceneFormData.page_count}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, page_count: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1459,7 +1459,7 @@ export default function ScriptBreakdown() {
                       type="number"
                       value={sceneFormData.estimated_duration}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, estimated_duration: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1468,7 +1468,7 @@ export default function ScriptBreakdown() {
                     <select
                       value={sceneFormData.complexity_rating}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, complexity_rating: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value={1}>1 - Very Simple</option>
                       <option value={2}>2 - Simple</option>
@@ -1483,7 +1483,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={sceneFormData.description}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={3}
                     />
                   </div>
@@ -1493,7 +1493,7 @@ export default function ScriptBreakdown() {
                     <textarea
                       value={sceneFormData.script_notes}
                       onChange={(e) => setSceneFormData({ ...sceneFormData, script_notes: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows={2}
                     />
                   </div>

@@ -603,7 +603,7 @@ export default function Stripboard() {
             <select 
               value={selectedProjectId || ''}
               onChange={(e) => setSelectedProjectId(e.target.value)}
-              className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex rounded-md border bg-background px-4 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <option value="">Select Project</option>
               {projects.map(project => (
@@ -736,7 +736,7 @@ export default function Stripboard() {
                       setSelectedCastMember(e.target.value || null);
                       if (e.target.value) setSortBy('cast_appearances');
                     }}
-                    className={`flex h-8 rounded-md border border-input px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                    className={`flex h-8 rounded-md border border-input px-3 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                       sortBy === 'cast_appearances' ? 'bg-primary text-primary-foreground' : 'bg-background'
                     }`}
                   >
@@ -840,7 +840,7 @@ export default function Stripboard() {
                       required
                       value={editFormData.scene_number}
                       onChange={(e) => setEditFormData({ ...editFormData, scene_number: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -850,7 +850,7 @@ export default function Stripboard() {
                       type="text"
                       value={editFormData.scene_name}
                       onChange={(e) => setEditFormData({ ...editFormData, scene_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -860,7 +860,7 @@ export default function Stripboard() {
                       type="text"
                       value={editFormData.location_name}
                       onChange={(e) => setEditFormData({ ...editFormData, location_name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -869,7 +869,7 @@ export default function Stripboard() {
                     <select
                       value={editFormData.scene_type}
                       onChange={(e) => setEditFormData({ ...editFormData, scene_type: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="int">Interior</option>
                       <option value="ext">Exterior</option>
@@ -882,7 +882,7 @@ export default function Stripboard() {
                     <select
                       value={editFormData.time_of_day}
                       onChange={(e) => setEditFormData({ ...editFormData, time_of_day: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="day">Day</option>
                       <option value="night">Night</option>
@@ -899,7 +899,7 @@ export default function Stripboard() {
                       step="0.125"
                       value={editFormData.page_count}
                       onChange={(e) => setEditFormData({ ...editFormData, page_count: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -909,7 +909,7 @@ export default function Stripboard() {
                       type="number"
                       value={editFormData.estimated_duration}
                       onChange={(e) => setEditFormData({ ...editFormData, estimated_duration: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -918,7 +918,7 @@ export default function Stripboard() {
                     <select
                       value={editFormData.complexity_rating}
                       onChange={(e) => setEditFormData({ ...editFormData, complexity_rating: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value={1}>1 - Very Simple</option>
                       <option value={2}>2 - Simple</option>
@@ -934,7 +934,7 @@ export default function Stripboard() {
                       value={editFormData.description}
                       onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -980,7 +980,7 @@ export default function Stripboard() {
                             }
                           }}
                           disabled={updating}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                         >
                           <option value="">Select a character to add...</option>
                           {availableCharacters
@@ -1037,7 +1037,7 @@ export default function Stripboard() {
                             }
                           }}
                           disabled={updating}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                         >
                           <option value="">Select a prop to add...</option>
                           {availableProps
@@ -1140,7 +1140,7 @@ export default function Stripboard() {
                         }
                         setScheduleFormData(newData)
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -1149,7 +1149,7 @@ export default function Stripboard() {
                     <select
                       value={scheduleFormData.status}
                       onChange={(e) => setScheduleFormData({ ...scheduleFormData, status: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="not_scheduled">Not Scheduled</option>
                       <option value="scheduled">Scheduled</option>
