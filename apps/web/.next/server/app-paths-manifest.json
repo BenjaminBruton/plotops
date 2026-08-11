@@ -1,8 +1,7 @@
 {
-  "/script-breakdown/page": "app/script-breakdown/page.js",
   "/crew/page": "app/crew/page.js",
+  "/contracts/page": "app/contracts/page.js",
   "/stripboard/page": "app/stripboard/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/props/page": "app/props/page.js",
+  "/marketing/page": "app/marketing/page.js",
   "/locations/page": "app/locations/page.js"
 }

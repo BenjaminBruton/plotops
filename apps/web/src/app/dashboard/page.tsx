@@ -39,44 +39,58 @@ export default function Dashboard() {
   }
 
   async function loadDashboardData() {
+    setLoading(true)
+    
+    // Load user name first (independent of stats)
     try {
-      setLoading(true)
       const user = await getCurrentUser()
-      const dashboardStats = await getDashboardStats()
-      setStats(dashboardStats)
-      
-      // Load user profile from database
       if (user) {
         const { supabase } = await import('../../lib/supabase')
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
-          .select('first_name, last_name, organizations(name)')
+          .select('first_name, last_name, organization_id, organizations(name)')
           .eq('id', user.id)
           .single()
         
+        console.log('📊 Profile query result:', { profile, profileError, userEmail: user.email })
+        
         if (profile) {
-          const firstName = profile.first_name || 'there'
+          const firstName = profile.first_name
+          const lastName = profile.last_name
+          const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName
           const orgName = profile.organizations ? (profile.organizations as any).name : null
           
-          // Show "FirstName @ Organization"
-          if (orgName && firstName !== 'there') {
-            setUserName(`${firstName} @ ${orgName}`)
-          } else if (firstName !== 'there') {
-            setUserName(firstName)
+          // Priority: Full Name @ Organization > Full Name > Organization > Email
+          if (fullName && orgName) {
+            setUserName(`${fullName} @ ${orgName}`)
+          } else if (fullName) {
+            setUserName(fullName)
           } else if (orgName) {
             setUserName(orgName)
           } else {
-            setUserName(user.email?.split('@')[0] || 'there')
+            // Fallback to email username
+            const emailName = user.email?.split('@')[0]
+            setUserName(emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1) : 'User')
           }
         } else {
-          setUserName(user.email?.split('@')[0] || 'there')
+          // No profile found, use email
+          const emailName = user.email?.split('@')[0]
+          setUserName(emailName ? emailName.charAt(0).toUpperCase() + emailName.slice(1) : 'User')
         }
       }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-    } finally {
-      setLoading(false)
+      console.error('Failed to load user name:', error)
     }
+    
+    // Load dashboard stats (independent of user name)
+    try {
+      const dashboardStats = await getDashboardStats()
+      setStats(dashboardStats)
+    } catch (error) {
+      console.error('Failed to load dashboard stats:', error)
+    }
+    
+    setLoading(false)
   }
 
   const selectedProject = selectedProjectId === 'all' 
